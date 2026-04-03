@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>needed v8</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0f1a;--surf:#111827;--surf2:#1a2235;--surf3:#212e44;
+  --green:#00e5a0;--orange:#ff6b35;--amber:#f59e0b;--purple:#a78bfa;
+  --blue:#60a5fa;--pink:#f472b6;--red:#f87171;--teal:#2dd4bf;
+  --text:#f0f4ff;--muted:#8892a4;--bdr:#1e2d45;--bdr2:#2a3d58;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+*::-webkit-scrollbar{width:3px;height:3px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+
+/* SHELL */
+#shell{display:flex;flex-direction:column;width:100%;height:100%;position:relative}
+#view{flex:1;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.screen.active{display:flex}
+
+/* BOTTOM NAV (3 TABS) */
+#bnav{display:flex;background:var(--surf);border-top:1px solid var(--bdr);padding:6px 0 env(safe-area-inset-bottom,10px);flex-shrink:0;z-index:80}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;background:none;border:none;color:var(--muted);transition:color .15s}
+.nb.on{color:var(--green)}
+.nb .ni{font-size:19px;line-height:1.1}
+.nb .nl{font-size:9px;font-family:'Space Mono',monospace}
+.nb .nd{width:4px;height:4px;border-radius:50%;background:transparent;transition:background .15s;margin-top:1px}
+.nb.on .nd{background:var(--green)}
+
+/* COMMON */
+.topbar{padding:12px 14px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0;justify-content:space-between}
+.page-title{font-size:18px;font-weight:600;color:var(--text)}
+.page-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.scrollbody{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:11px}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bdr)}
+.row:last-child{border-bottom:none;padding-bottom:0}
+.row-l{font-size:12px;color:var(--muted)}
+.row-r{font-size:12px;color:var(--text);font-weight:500;display:flex;align-items:center;gap:6px}
+.pill{border-radius:20px;padding:3px 9px;font-size:11px;font-weight:500}
+.pg{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.25)}
+.pr{background:rgba(248,113,113,.1);color:#fca5a5;border:1px solid rgba(248,113,113,.25)}
+.pb{background:rgba(96,165,250,.1);color:#93c5fd;border:1px solid rgba(96,165,250,.25)}
+.tag{border-radius:7px;padding:3px 8px;font-size:10px;border:1px solid;display:inline-flex;align-items:center;gap:3px}
+.tf{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.3);color:#93c5fd}
+.th{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.35);color:#fdba74}
+.tk{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d}
+.to{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.35);color:#c4b5fd}
+.tv{background:rgba(45,212,191,.12);border-color:rgba(45,212,191,.35);color:#5eead4}
+.tp{background:rgba(244,114,182,.12);border-color:rgba(244,114,182,.35);color:#f9a8d4}
+.tprice{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:#6ee7b7}
+.flabel{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.finp{width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:9px 11px;color:var(--text);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;margin-bottom:10px}
+.bigbtn{width:100%;border:none;border-radius:11px;padding:12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-green{background:var(--green);color:#000}
+.btn-orange{background:var(--orange);color:#fff}
+
+/* SUB TABS & PROTOTYPE NOTES */
+.sub-tabs{display:flex;background:var(--surf2);border-radius:10px;margin:10px 14px 0;border:1px solid var(--bdr);flex-shrink:0;overflow:hidden}
+.sub-tab{flex:1;text-align:center;padding:9px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:0.2s}
+.sub-tab.active{background:var(--surf3);color:var(--text)}
+.proto-note{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);border-left:3px solid var(--blue);padding:10px;font-size:11px;color:var(--blue);border-radius:6px;font-family:'Space Mono',monospace;margin-bottom:12px;line-height:1.5}
+
+/* STORE & ASSETS */
+.store-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dp-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:5px;position:relative}
+.port-seg{margin-bottom:4px}
+.seg-hdr{display:flex;align-items:center;padding:11px 14px;cursor:pointer;user-select:none;border-radius:12px;transition:background .15s;gap:8px}
+.seg-hdr:hover{background:var(--surf2)}
+.seg-icon{font-size:15px}
+.seg-name{font-size:13px;font-weight:600;color:var(--text)}
+.seg-count{font-size:10px;font-family:'Space Mono',monospace;padding:2px 7px;border-radius:10px}
+.seg-chevron{font-size:11px;color:var(--muted);transition:transform .2s;margin-left:auto}
+.seg-chevron.open{transform:rotate(180deg)}
+.seg-body{padding:0 4px 10px;display:flex;flex-direction:column;gap:7px}
+.seg-body.hidden{display:none}
+.port-item{background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;padding:10px 11px;display:flex;align-items:center;gap:9px}
+.pi-ico{font-size:18px;width:34px;height:34px;background:var(--surf);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pi-info{flex:1;min-width:0}
+.pi-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.pi-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.spill{border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap;font-family:'Space Mono',monospace}
+.sp-n{background:rgba(0,229,160,.12);color:var(--green);border-color:rgba(0,229,160,.3)}
+.sp-o{background:rgba(255,107,53,.12);color:#fdba74;border-color:rgba(255,107,53,.3)}
+.sp-v{background:var(--surf);color:var(--muted);border-color:var(--bdr)}
+.pi-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:3px}
+
+/* SOCIAL & STATUS CIRCLES */
+.status-bar{display:flex;gap:12px;padding:12px 14px;overflow-x:auto;background:rgba(10,15,26,0.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--bdr);transition:0.3s;scrollbar-width:none;z-index:40;position:absolute;top:48px;left:0;right:0}
+.status-bar::-webkit-scrollbar{display:none}
+.status-circle{width:46px;height:46px;border-radius:50%;border:2px solid var(--green);flex-shrink:0;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative}
+.status-circle::after{content:'';position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;background:var(--green);border-radius:50%;border:2px solid var(--bg)}
+.social-feed{display:flex;flex-direction:column;gap:12px}
+.post-card{background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:14px}
+
+/* RADAR */
+#view-map{position:absolute;inset:0;top:48px}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.rtopbar{position:absolute;top:0;left:0;right:0;padding:11px 13px;z-index:20;display:flex;align-items:center;gap:7px}
+.logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--green)}
+.logo b{color:var(--text);font-weight:700}
+.hud{background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;padding:6px 9px;display:flex;flex-direction:column;align-items:flex-end;gap:1px;margin-left:auto}
+.hrow{display:flex;align-items:center;gap:4px}
+.hdot{width:5px;height:5px;border-radius:50%;background:var(--green);transition:background .4s}
+.hname{font-size:11px;font-weight:500;color:var(--green);font-family:'Space Mono',monospace;transition:color .4s}
+.role-pill{display:flex;align-items:center;background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;padding:0;overflow:hidden;flex-shrink:0;margin-left:auto}
+.role-pill button{background:none;border:none;padding:5px 10px;font-size:10px;font-family:'Space Mono',monospace;cursor:pointer;color:var(--muted);transition:all .2s;white-space:nowrap}
+.role-pill button.rp-seeking.active{background:var(--green);color:#000;border-radius:20px 0 0 20px}
+.role-pill button.rp-providing.active{background:var(--orange);color:#fff;border-radius:0 20px 20px 0}
+.role-pill button.rp-both.active{background:var(--surf3);color:var(--text);border-radius:0}
+.rnode{position:absolute;cursor:pointer;transform:translate(-50%,-50%);z-index:8;transition:left .5s ease,top .5s ease}
+.nbub{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px solid rgba(255,255,255,.12);transition:transform .15s;position:relative}
+.nlbl{position:absolute;top:calc(100%+4px);left:50%;transform:translateX(-50%);font-size:9px;font-family:'Space Mono',monospace;white-space:nowrap;background:rgba(10,15,26,.94);padding:2px 5px;border-radius:3px;color:var(--text)}
+.sbadge{position:absolute;top:-7px;right:-7px;min-width:16px;height:16px;border-radius:8px;border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'Space Mono',monospace;padding:0 3px}
+
+/* BEARING CONTROLS (v7 inclusion) */
+.bearing-hud{position:absolute;bottom:12px;right:12px;z-index:20;background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bearing-compass{width:44px;height:44px;position:relative;flex-shrink:0}
+.bearing-compass svg{width:44px;height:44px}
+.bearing-lbl{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center}
+.bearing-val{font-size:11px;color:var(--text);font-family:'Space Mono',monospace;font-weight:700;text-align:center}
+
+@keyframes pulse-r{0%{opacity:.9;transform:translate(-50%,-50%) scale(.88)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.07)}}
+@keyframes floatn{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes ypng{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.5);opacity:0}}
+
+/* PANELS */
+.panel{position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end;pointer-events:none;opacity:0;transition:opacity .2s}
+.panel.on{pointer-events:auto;opacity:1;background:rgba(0,0,0,.55)}
+.sheet{width:100%;border-radius:18px 18px 0 0;background:var(--surf);border-top:1px solid var(--bdr);padding:16px;transform:translateY(100%);transition:transform .28s ease;max-height:92vh;overflow-y:auto;position:relative}
+.panel.on .sheet{transform:translateY(0)}
+.shclose{position:absolute;right:13px;top:13px;background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
+.msgs{padding:10px;display:flex;flex-direction:column;gap:6px;min-height:90px;max-height:130px;overflow-y:auto}
+.msg{max-width:78%;padding:7px 9px;border-radius:10px;font-size:12px;line-height:1.4;color:var(--text)}
+.msg.them{background:var(--surf);border-radius:3px 10px 10px 10px;align-self:flex-start}
+.msg.me{background:rgba(0,229,160,.13);border-radius:10px 3px 10px 10px;align-self:flex-end;color:var(--green)}
+</style>
+</head>
+<body>
+<div id="shell">
+<div id="view">
+
+<div id="s-assets" class="screen">
+  <div class="topbar"><div><div class="page-title">Assets</div><div class="page-sub">Your digital inventory & store</div></div></div>
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="st-my" onclick="switchAssets('my')">My Assets</div>
+    <div class="sub-tab" id="st-store" onclick="switchAssets('store')">DP Store</div>
+  </div>
+  
+  <div id="v-myassets" class="scrollbody">
+    <div class="port-seg" id="seg-needed">
+      <div class="seg-hdr" onclick="PORT.toggleSeg('needed')"><span class="seg-icon">🔍</span><span class="seg-name">Needed</span><span class="seg-count sp-n" id="seg-needed-count">0</span></div>
+      <div class="seg-body" id="seg-needed-body"></div>
+    </div>
+    <div class="port-seg" id="seg-offering">
+      <div class="seg-hdr" onclick="PORT.toggleSeg('offering')"><span class="seg-icon">📡</span><span class="seg-name">Offering</span><span class="seg-count sp-o" id="seg-offering-count">0</span></div>
+      <div class="seg-body" id="seg-offering-body"></div>
+    </div>
+    <div class="port-seg" id="seg-vault">
+      <div class="seg-hdr" onclick="PORT.toggleSeg('vault')"><span class="seg-icon">🗄️</span><span class="seg-name">Vault</span><span class="seg-count sp-v" id="seg-vault-count">0</span></div>
+      <div class="seg-body hidden" id="seg-vault-body"></div>
+    </div>
+    <div class="proto-note">PROTOTYPE NOTE: 'Needed' items trigger radar beacons. 'Offering' makes you visible to others. 'Vault' is private storage.</div>
+  </div>
+
+  <div id="v-store" class="scrollbody" style="display:none;">
+    <div class="proto-note">PROTOTYPE NOTE: The Store simulates acquiring a Digital Product Twin (DP). Tapping "Get DP" adds the asset to your "Needed" list, instantly lighting up the contextual Social Feed and Map Beacons.</div>
+    <div class="store-grid" id="store-grid"></div>
+  </div>
+</div>
+
+<div id="s-radar" class="screen active">
+  <div class="sub-tabs" style="position:absolute; top:0; left:0; right:0; z-index:30; margin:10px 100px 0 14px;">
+    <div class="sub-tab active" id="st-map" onclick="switchRadar('map')">Map</div>
+    <div class="sub-tab" id="st-social" onclick="switchRadar('social')">Social</div>
+  </div>
+  <div class="role-pill" id="role-pill" style="position:absolute; top:12px; right:14px; z-index:30;">
+    <button class="rp-seeking active" id="rp-seeking" onclick="LENS.setRole('seeking')">Seek</button>
+    <button class="rp-both" id="rp-both" onclick="LENS.setRole('both')">Both</button>
+    <button class="rp-providing" id="rp-providing" onclick="LENS.setRole('providing')">Provide</button>
+  </div>
+
+  <div class="status-bar" id="status-bar" style="display:none;"></div>
+
+  <div id="v-map" style="position:absolute; inset:0; top:48px;">
+    <canvas id="mc"></canvas>
+    <div id="rings" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none"><div style="width:15px;height:15px;border-radius:50%;background:var(--green);border:2px solid #fff"></div></div>
+    <div id="nodes"></div>
+    <div id="beacons"></div>
+    
+    <div class="bearing-hud" id="bearing-hud">
+      <div class="bearing-compass">
+        <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><line id="bearing-needle" x1="22" y1="22" x2="22" y2="5" stroke="#00e5a0" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="bearing-val" id="bearing-deg">45°</div>
+      <div class="bearing-lbl">your heading</div>
+      <input type="range" min="0" max="359" value="45" step="1" id="bearing-slider" style="width:60px;margin-top:2px" oninput="setBearing(this.value)">
+    </div>
+  </div>
+
+  <div id="v-social" class="scrollbody" style="position:absolute; inset:0; top:48px; display:none; padding-top:80px;">
+    <div class="proto-note">PROTOTYPE NOTE: This feed is intent-gated. You will ONLY see posts here if you have acquired an item from the Store and it sits in your "Needed" list.</div>
+    <div class="social-feed" id="social-feed"></div>
+  </div>
+</div>
+
+<div id="s-dashboard" class="screen">
+  <div class="topbar"><div><div class="page-title">Dashboard</div><div class="page-sub">History & Settings</div></div></div>
+  <div class="sub-tabs">
+    <div class="sub-tab active" id="st-activity" onclick="switchDash('activity')">Activity</div>
+    <div class="sub-tab" id="st-profile" onclick="switchDash('profile')">Profile</div>
+  </div>
+
+  <div id="v-activity" class="scrollbody">
+    <div class="card"><div class="card-title">Recent Chats</div><div id="act-chats"></div></div>
+    <div class="card"><div class="card-title">Ledger</div>
+      <div class="row"><span class="row-l">Keke seat · Yaba</span><span class="row-r" style="color:var(--red)">−₦150</span></div>
+      <div class="row"><span class="row-l">Zobo sold ×3</span><span class="row-r" style="color:var(--green)">+₦600</span></div>
+    </div>
+  </div>
+
+  <div id="v-profile" class="scrollbody" style="display:none;">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:50px;height:50px;border-radius:50%;background:rgba(0,229,160,.14);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--green)">AO</div>
+        <div><div style="font-size:15px;font-weight:600">Adeola O.</div><div style="font-size:11px;color:var(--muted)">Lagos Island</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Settings</div>
+      <div class="row"><span class="row-l">Phone</span><span class="row-r">+234 ••• 4521</span></div>
+      <div class="row"><span class="row-l">App version</span><span class="row-r">needed v8 (Decentralized OS)</span></div>
+    </div>
+  </div>
+</div>
+
+</div><div id="bnav">
+  <button class="nb" id="tab-assets" onclick="showTab('assets')"><span class="ni">⊞</span><span class="nl">Assets</span><div class="nd"></div></button>
+  <button class="nb on" id="tab-radar" onclick="showTab('radar')"><span class="ni">◎</span><span class="nl">Radar</span><div class="nd"></div></button>
+  <button class="nb" id="tab-dashboard" onclick="showTab('dashboard')"><span class="ni">◷</span><span class="nl">Dashboard</span><div class="nd"></div></button>
+</div>
+</div>
+
+<div class="panel" id="p-item">
+  <div class="sheet">
+    <button class="shclose" onclick="P.close('p-item')">✕</button>
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:9px">
+      <span style="font-size:26px" id="ii-ico">🛺</span>
+      <div><div style="font-size:15px;font-weight:600" id="ii-title">Item</div><div style="font-size:11px;color:var(--muted);margin-top:1px" id="ii-sub">—</div></div>
+    </div>
+    <div style="border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:var(--surf2)">
+      <div style="padding:9px 11px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:7px">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,229,160,.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600" id="c-av">?</div>
+        <div><div style="font-size:12px;font-weight:500;color:var(--text)" id="c-name">—</div></div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div style="padding:8px 10px;border-top:1px solid var(--bdr);display:flex;gap:6px">
+        <input class="finp" id="cinp" style="margin-bottom:0;border-radius:20px" placeholder="Message..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button style="background:var(--green);color:#000;border:none;border-radius:50%;width:35px;height:35px;font-weight:700;cursor:pointer" onclick="sendMsg()">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════ CONSTANTS & SETUP ═══════════════ */
+var W=function(){return window.innerWidth};
+var H=function(){return window.innerHeight};
+var CX=function(){return W()/2};
+var CY=function(){return (H()-110)/2}; // offset for sub-tabs and bnav
+
+/* Base Mock Data */
+var fixeds = [
+  {id:'f1', icon:'🥩', label:'Suya spot', seller:'Ibrahim S.', av:'IS', price:'₦500', color:'#ff6b35', vt:'fixed', route:{origin:'',destination:'',bearing:null}, dist:78, angle:325, msgs:[{m:false,t:'Fresh suya ready! 🔥'}]},
+  {id:'f2', icon:'👗', label:'Ankara fabric', seller:'Chisom A.', av:'CA', price:'₦2,500', color:'#a78bfa', vt:'fixed', route:{origin:'',destination:'',bearing:null}, dist:105, angle:178, msgs:[{m:false,t:'Which pattern do you want?'}]}
+];
+var mobiles = [
+  {id:'k1', icon:'🛺', label:'Keke — Yaba', seller:'Musa D.', av:'MD', price:'₦150', color:'#f59e0b', vt:'keke', route:{origin:'Surulere',destination:'Yaba',bearing:45}, totalSeats:3, seats:2, angle:42, dist:155, vAngle:45, speed:2.5, parked:false, msgs:[{m:false,t:'Going Yaba now!'}]},
+  {id:'h1', icon:'🧃', label:'Cold zobo', seller:'Amaka K.', av:'AK', price:'₦200', color:'#10b981', vt:'hawk', route:{origin:'',destination:'',bearing:195}, angle:90, dist:160, vAngle:195, speed:1.0, parked:false, msgs:[{m:false,t:'Cold zobo!'}]}
+];
+
+var portfolio = [
+  {id:'p3', icon:'🚺', label:'My Keke - Yaba Run', price:'₦150/seat', color:'#f59e0b', status:'vault', isBeaconActive:false, vt:'keke', route:{origin:'Surulere',destination:'Yaba',bearing:45}}
+];
+
+var allItems = fixeds.concat(mobiles);
+var activeItem = null;
+var userBearing = 45;
+
+/* ═══════════════ STORE MOCK ═══════════════ */
+const storeDPs = [
+  { icon: '🧃', name: 'Zobo Premium', price: '₦200', creator: 'Amaka K.', color:'#10b981' },
+  { icon: '👗', name: 'Ankara Fabric', price: '₦2,500', creator: 'Chisom A.', color:'#a78bfa' },
+  { icon: '🛺', name: 'Keke Ride to Yaba', price: '₦150', creator: 'Yaba Transports', color:'#f59e0b' },
+  { icon: '🥩', name: 'Spicy Suya', price: '₦500', creator: 'Ibrahim S.', color:'#ff6b35' }
+];
+
+function renderStore() {
+  const grid = document.getElementById('store-grid');
+  grid.innerHTML = '';
+  storeDPs.forEach((dp, i) => {
+      grid.innerHTML += `<div class="dp-card">
+          <div style="font-size:24px; position:absolute; top:12px; right:12px; opacity:0.2">${dp.icon}</div>
+          <div style="font-size:24px; margin-bottom:5px">${dp.icon}</div>
+          <div style="font-weight:600; font-size:13px">${dp.name}</div>
+          <div style="font-size:10px; color:var(--muted)">by ${dp.creator}</div>
+          <div style="font-size:12px; color:var(--green); font-weight:600; margin-top:2px">${dp.price}</div>
+          <button onclick="getDP(${i})" style="background:var(--surf); color:var(--text); border:1px solid var(--bdr); padding:8px; border-radius:8px; font-size:11px; font-weight:600; margin-top:5px; cursor:pointer; transition:0.2s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--bdr)'">📥 Get DP Twin</button>
+      </div>`;
+  });
+}
+
+function getDP(i) {
+  let dp = storeDPs[i];
+  portfolio.push({
+      id: 'p'+Date.now(), icon: dp.icon, label: dp.name, price: dp.price, color: dp.color,
+      status: 'needed', isBeaconActive: true, vt: 'fixed',
+      route: { origin:'', destination:'', bearing: userBearing }
+  });
+  PORT.render();
+  renderAll();
+  switchAssets('my');
+  
+  // Create a visual toast
+  let t = document.createElement('div');
+  t.style.cssText = 'position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--surf2); border:1px solid var(--green); color:var(--green); padding:10px 15px; border-radius:20px; font-size:12px; font-weight:600; z-index:999; box-shadow:0 5px 15px rgba(0,0,0,0.5);';
+  t.innerHTML = `📥 ${dp.name} added to Needed`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+/* ═══════════════ STATUS BAR & SOCIAL ═══════════════ */
+function updateStatusBar() {
+  let needed = portfolio.filter(p => p.status === 'needed');
+  let bar = document.getElementById('status-bar');
+  let feed = document.getElementById('social-feed');
+  let mapTop = document.getElementById('v-map');
+  let socialTop = document.getElementById('v-social');
+
+  if(needed.length > 0) {
+      bar.style.display = 'flex';
+      bar.innerHTML = '';
+      feed.innerHTML = '';
+      
+      // Push UI down to make room for status bar
+      mapTop.style.top = '115px';
+      socialTop.style.top = '115px';
+
+      needed.forEach(n => {
+         bar.innerHTML += `<div class="status-circle" onclick="switchRadar('social')">${n.icon}</div>`;
+         
+         feed.innerHTML += `<div class="post-card">
+             <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px">
+                 <div class="status-circle" style="width:36px; height:36px; font-size:16px; border:none; background:var(--surf)">${n.icon}</div>
+                 <div><div style="font-size:13px; font-weight:600">${n.label} Creator</div><div style="font-size:10px; color:var(--green)">Active locally right now</div></div>
+             </div>
+             <div style="font-size:12px; color:var(--text); line-height:1.5">Fresh batch of ${n.label} available in your area! My supply node is live on the radar. Intercept my route to grab yours.</div>
+             <div style="margin-top:10px; font-size:11px; color:var(--muted); font-family:'Space Mono',monospace">📡 Triggered by your Needed list</div>
+         </div>`;
+      });
+  } else {
+      bar.style.display = 'none';
+      mapTop.style.top = '48px';
+      socialTop.style.top = '48px';
+      feed.innerHTML = `<div style="text-align:center; padding:30px 15px; color:var(--muted);">
+        <div style="font-size:30px; margin-bottom:10px">📭</div>
+        <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:5px">No Intent, No Noise</div>
+        <div style="font-size:12px; line-height:1.5">Your social feed is empty. Get a Digital Twin from the Store to see contextual local updates.</div>
+      </div>`;
+  }
+}
+
+/* ═══════════════ BEACON & CORRIDOR MATH ═══════════════ */
+function bearingDelta(a, b) {
+  let d = Math.abs(a - b) % 360; 
+  return d > 180 ? 360 - d : d;
+}
+
+function getItemBearing(item) {
+  if(item.route && item.route.bearing !== null && item.route.bearing !== undefined) return item.route.bearing;
+  return null;
+}
+
+function isPathMatching(item) {
+  let bearing = getItemBearing(item);
+  if(bearing === null) return {match:true, score:0.7, label:'fixed', delta:0};
+  let delta = bearingDelta(userBearing, bearing);
+  if(delta <= 45) return {match:true, score:1.0, label:'same way', delta:delta};
+  if(delta <= 90) return {match:true, score:0.65, label:'cross path', delta:delta};
+  return {match:false, score:0.3, label:'opposite', delta:delta};
+}
+
+function getActiveBeacons() {
+  return portfolio.filter(p => p.status === 'needed' && p.isBeaconActive);
+}
+
+function renderBeacons() {
+  let layer = document.getElementById('beacons');
+  if(!layer) return;
+  layer.innerHTML = '';
+  
+  if(LENS.userRole === 'seeking') return; // Only providers see anonymous demand beacons
+
+  getActiveBeacons().forEach(b => {
+       // deterministic mock position based on id
+       let hash = b.id.charCodeAt(1) * 10;
+       let dist = 80 + (hash % 100);
+       let angle = (hash * 13) % 360;
+       
+       let corr = isPathMatching(b);
+       let isMatch = corr && corr.match;
+
+       let cx=CX(), cy=CY();
+       let px = cx + Math.cos(angle*Math.PI/180)*dist*LENS.distanceScale;
+       let py = cy + Math.sin(angle*Math.PI/180)*dist*LENS.distanceScale;
+
+       let el = document.createElement('div');
+       el.className = 'rnode';
+       el.style.left = px+'px'; el.style.top = py+'px';
+
+       if(isMatch) {
+           el.innerHTML = '<div class="nbub" style="background:rgba(0,229,160,0.2); border:2px solid var(--green); border-radius:50%; width:44px; height:44px; animation:ypng 1.5s infinite"><span style="font-size:20px">'+b.icon+'</span><div class="sbadge" style="background:var(--green);color:#000;padding:2px 4px;font-size:8px">MATCH</div></div>';
+           el.onclick = () => openBeaconChat(b);
+       } else {
+           let glowSize = 70;
+           el.innerHTML = '<div style="width:'+glowSize+'px; height:'+glowSize+'px; background:rgba(0,229,160,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; filter:blur(1px);"><span style="font-size:24px; opacity:0.3; filter:blur(2px)">'+b.icon+'</span></div>';
+       }
+       layer.appendChild(el);
+  });
+}
+
+function openBeaconChat(b) {
+  openItem({
+      id: b.id, icon: b.icon, label: 'Anonymous Seeker', vt: 'fixed', dist: 100, parked: true, price: b.price, seller: 'Hidden Identity', av: '?', msgs: [{m:false, t:'Looking for '+b.label+'. Are you heading my way?'}]
+  });
+}
+
+/* ═══════════════ LENS & RADAR BASE ═══════════════ */
+var LENS = {
+  distanceScale: 0.92,
+  userRole: 'both',
+  ROLE_COLORS: {
+    seeking: {ring:'rgba(0,229,160,'}, providing:{ring:'rgba(255,107,53,'}, both:{ring:'rgba(167,139,250,'}
+  },
+  setRole: function(role) {
+    LENS.userRole = role;
+    ['seeking','both','providing'].forEach(r => {
+      let b = document.getElementById('rp-'+r); if(b) b.className = 'rp-'+r+(r===role?' active':'');
+    });
+    drawBg(); buildRings(); renderAll();
+  }
+};
+
+function setBearing(val){
+  userBearing = parseInt(val);
+  document.getElementById('bearing-deg').textContent = userBearing+'°';
+  document.getElementById('bearing-needle').setAttribute('transform', 'rotate('+userBearing+' 22 22)');
+  renderAll(); // re-eval path matching
+}
+
+function drawBg() {
+  let c = document.getElementById('mc'); if(!c) return;
+  let ctx = c.getContext('2d');
+  c.width = W(); c.height = H()-110;
+  ctx.fillStyle = '#0a0f1a'; ctx.fillRect(0,0,W(),H());
+  ctx.strokeStyle = 'rgba(30,45,69,0.45)'; ctx.lineWidth = 1;
+  for(let i=-20; i<30; i++){ ctx.beginPath(); ctx.moveTo(i*40,0); ctx.lineTo(i*40+H()*0.5,H()); ctx.stroke(); }
+  for(let j=0; j<20; j++){ ctx.beginPath(); ctx.moveTo(0,j*55); ctx.lineTo(W(),j*55); ctx.stroke(); }
+}
+
+function buildRings() {
+  let r = document.getElementById('rings'); if(!r) return; r.innerHTML = '';
+  let rc = LENS.ROLE_COLORS[LENS.userRole].ring;
+  [120, 240, 340].forEach((s,i) => {
+    let el = document.createElement('div');
+    el.style.cssText = `position:absolute;border-radius:50%;border:1px solid ${rc}${0.28-i*0.07});top:50%;left:50%;transform:translate(-50%,-50%);width:${s}px;height:${s}px;animation:pulse-r 2s ease-out infinite ${i*0.5}s;`;
+    r.appendChild(el);
+  });
+}
+
+function renderNode(item) {
+  let layer = document.getElementById('nodes'); if(!layer) return;
+  let el = document.getElementById('nd-'+item.id);
+  if(!el){ el = document.createElement('div'); el.className = 'rnode'; el.id = 'nd-'+item.id; layer.appendChild(el); }
+  
+  let cx=CX(), cy=CY();
+  let rad = item.angle*(Math.PI/180);
+  let px = cx + Math.cos(rad)*item.dist*LENS.distanceScale;
+  let py = cy + Math.sin(rad)*item.dist*LENS.distanceScale;
+  el.style.left = px+'px'; el.style.top = py+'px';
+  
+  let corr = isPathMatching(item);
+  let opacity = corr.match ? 1.0 : 0.3;
+  if(LENS.userRole === 'seeking' && item.vt !== 'fixed' && !item.totalSeats) opacity = 0.5; // dim other seekers
+  el.style.opacity = opacity;
+
+  let bdr = corr.match ? `2px solid ${item.color}` : `2px dashed ${item.color}55`;
+  
+  el.innerHTML = `<div class="nbub" style="background:${item.color}28; border-radius:50%; border:${bdr}"><span style="font-size:18px">${item.icon}</span></div><div class="nlbl" style="color:${item.color}">${item.label}</div>`;
+  el.onclick = () => openItem(item);
+}
+
+function renderAll() {
+  let l = document.getElementById('nodes'); if(l) l.innerHTML='';
+  allItems = fixeds.concat(mobiles).concat(portfolio.filter(p => p.status === 'offering'));
+  allItems.forEach(renderNode);
+  renderBeacons();
+}
+
+/* ═══════════════ PORTFOLIO MODULE ═══════════════ */
+var PORT = {
+  render: function() {
+    ['needed', 'offering', 'vault'].forEach(seg => {
+      let items = portfolio.filter(p => p.status === seg);
+      let body = document.getElementById('seg-'+seg+'-body');
+      let cnt = document.getElementById('seg-'+seg+'-count');
+      if(!body) return;
+      cnt.textContent = items.length;
+      body.innerHTML = '';
+      let sCls = {needed:'sp-n', offering:'sp-o', vault:'sp-v'};
+      let sLab = {needed:'Needed', offering:'Offering', vault:'Vault'};
+      
+      items.forEach((item) => {
+        let realIdx = portfolio.indexOf(item);
+        let bcnBtn = seg === 'needed' ? `<span class="spill ${item.isBeaconActive ? 'sp-n' : 'sp-v'}" onclick="PORT.toggleBeacon(${realIdx})">📡 ${item.isBeaconActive ? 'Live' : 'Off'}</span>` : '';
+        body.innerHTML += `<div class="port-item">
+          <div class="pi-ico">${item.icon}</div>
+          <div class="pi-info"><div class="pi-name">${item.label}</div><div class="pi-meta">${item.price}</div></div>
+          <div class="pi-actions">
+            ${bcnBtn}
+            <span class="spill ${sCls[item.status]}" onclick="PORT.cycle(${realIdx})">${sLab[item.status]}</span>
+          </div>
+        </div>`;
+      });
+    });
+    updateStatusBar();
+  },
+  toggleSeg: function(seg) {
+    let b = document.getElementById('seg-'+seg+'-body');
+    b.classList.toggle('hidden');
+  },
+  cycle: function(idx) {
+    let item = portfolio[idx];
+    let nxt = {needed:'offering', offering:'vault', vault:'needed'};
+    item.status = nxt[item.status];
+    PORT.render(); renderAll();
+  },
+  toggleBeacon: function(idx) {
+    portfolio[idx].isBeaconActive = !portfolio[idx].isBeaconActive;
+    PORT.render(); renderAll();
+  }
+};
+
+/* ═══════════════ UI & TABS ═══════════════ */
+function showTab(name) {
+  ['assets', 'radar', 'dashboard'].forEach(k => {
+    document.getElementById('s-'+k).classList.remove('active');
+    document.getElementById('tab-'+k).classList.remove('on');
+  });
+  document.getElementById('s-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('on');
+  if(name === 'radar') { drawBg(); renderAll(); }
+}
+
+function switchAssets(tab) {
+  document.getElementById('st-my').className = 'sub-tab' + (tab==='my'?' active':'');
+  document.getElementById('st-store').className = 'sub-tab' + (tab==='store'?' active':'');
+  document.getElementById('v-myassets').style.display = tab==='my'?'block':'none';
+  document.getElementById('v-store').style.display = tab==='store'?'block':'none';
+}
+
+function switchRadar(tab) {
+  document.getElementById('st-map').className = 'sub-tab' + (tab==='map'?' active':'');
+  document.getElementById('st-social').className = 'sub-tab' + (tab==='social'?' active':'');
+  document.getElementById('v-map').style.display = tab==='map'?'block':'none';
+  document.getElementById('v-social').style.display = tab==='social'?'flex':'none';
+  if(tab === 'map') { drawBg(); renderAll(); }
+}
+
+function switchDash(tab) {
+  document.getElementById('st-activity').className = 'sub-tab' + (tab==='activity'?' active':'');
+  document.getElementById('st-profile').className = 'sub-tab' + (tab==='profile'?' active':'');
+  document.getElementById('v-activity').style.display = tab==='activity'?'block':'none';
+  document.getElementById('v-profile').style.display = tab==='profile'?'block':'none';
+}
+
+function openItem(item) {
+  activeItem = item;
+  document.getElementById('ii-ico').textContent = item.icon;
+  document.getElementById('ii-title').textContent = item.label;
+  document.getElementById('ii-sub').textContent = item.price;
+  document.getElementById('c-name').textContent = item.seller;
+  document.getElementById('c-av').textContent = item.av;
+  
+  let msgs = document.getElementById('msgs'); msgs.innerHTML = '';
+  (item.msgs||[]).forEach(m => {
+    msgs.innerHTML += `<div class="msg ${m.m?'me':'them'}">${m.t}</div>`;
+  });
+  
+  let p = document.getElementById('p-item');
+  p.classList.add('on');
+}
+
+function sendMsg() {
+  let inp = document.getElementById('cinp'); let text = inp.value.trim();
+  if(!text || !activeItem) return;
+  let msgs = document.getElementById('msgs');
+  msgs.innerHTML += `<div class="msg me">${text}</div>`;
+  inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  if(activeItem.label === 'Anonymous Seeker') {
+    setTimeout(() => {
+      msgs.innerHTML += `<div class="msg them">Thanks! Here is my exact location. 📍</div>`;
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 1000);
+  }
+}
+
+var P = { close: function(id) { document.getElementById(id).classList.remove('on'); } };
+
+/* ═══════════════ INIT ═══════════════ */
+window.addEventListener('resize', () => { drawBg(); renderAll(); });
+renderStore();
+PORT.render();
+drawBg(); buildRings(); renderAll();
+setBearing(45);
+
+/* Animate mobiles slightly */
+setInterval(() => {
+  mobiles.forEach(m => { m.angle += 0.2; });
+  renderAll();
+}, 200);
+</script>
+</body>
+</html>

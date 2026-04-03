@@ -24,19 +24,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
 .screen.active{display:flex}
 
-/* BOTTOM NAV - NEW 3-TAB */
+/* BOTTOM NAV */
 #bnav{display:flex;background:var(--surf);border-top:1px solid var(--bdr);padding:6px 0 env(safe-area-inset-bottom,10px);flex-shrink:0;z-index:80}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;background:none;border:none;color:var(--muted);transition:color .15s}
 .nb.on{color:var(--green)}
-.nb .ni{font-size:22px;line-height:1.1}
+.nb .ni{font-size:19px;line-height:1.1}
 .nb .nl{font-size:9px;font-family:'Space Mono',monospace}
 .nb .nd{width:4px;height:4px;border-radius:50%;background:transparent;transition:background .15s;margin-top:1px}
 .nb.on .nd{background:var(--green)}
-
-/* SEGMENTED CONTROL */
-.segmented{display:flex;background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:3px;margin:10px 14px}
-.segbtn{flex:1;padding:8px 0;font-size:13px;font-weight:500;border-radius:9px;cursor:pointer;transition:all .2s;text-align:center}
-.segbtn.on{background:var(--surf);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.nb-plus .ni-wrap{width:42px;height:42px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:-16px;border:3px solid var(--bg)}
 
 /* COMMON */
 .topbar{padding:12px 14px 8px;display:flex;align-items:center;gap:8px;flex-shrink:0}
@@ -75,17 +71,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .btn-surf{background:var(--surf2);color:var(--text);border:1px solid var(--bdr)}
 .btn-amber{background:var(--amber);color:#000}
 
-/* UI NOTE OVERLAY (for prototype) */
-.ui-note{position:absolute;background:rgba(10,15,26,0.92);border:1px solid var(--green);color:#6ee7b7;font-size:10px;font-family:'Space Mono',monospace;padding:4px 8px;border-radius:6px;z-index:100;pointer-events:none;line-height:1.3;max-width:240px}
-
-/* PANELS (unchanged) */
+/* PANELS */
 .panel{position:absolute;inset:0;z-index:60;display:flex;align-items:flex-end;pointer-events:none;opacity:0;transition:opacity .2s}
 .panel.on{pointer-events:auto;opacity:1;background:rgba(0,0,0,.55)}
 .sheet{width:100%;border-radius:18px 18px 0 0;background:var(--surf);border-top:1px solid var(--bdr);padding:16px;transform:translateY(100%);transition:transform .28s ease;max-height:92vh;overflow-y:auto;position:relative}
 .panel.on .sheet{transform:translateY(0)}
 .shclose{position:absolute;right:13px;top:13px;background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:3px 8px;font-size:11px;cursor:pointer;color:var(--muted)}
 
-/* RADAR (existing styles kept) */
+/* RADAR */
 #radar-screen{background:var(--bg)}
 canvas{position:absolute;inset:0;width:100%;height:100%}
 .rtopbar{position:absolute;top:0;left:0;right:0;padding:11px 13px;z-index:20;display:flex;align-items:center;gap:7px}
@@ -95,39 +88,347 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
 .hrow{display:flex;align-items:center;gap:4px}
 .hdot{width:5px;height:5px;border-radius:50%;background:var(--green);transition:background .4s}
 .hname{font-size:11px;font-weight:500;color:var(--green);font-family:'Space Mono',monospace;transition:color .4s}
-/* ... (all existing radar, node, beacon, bearing, etc. styles remain unchanged) ... */
+/* ROLE PILL */
+.role-pill{display:flex;align-items:center;background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;padding:0;overflow:hidden;flex-shrink:0}
+.role-pill button{background:none;border:none;padding:5px 10px;font-size:10px;font-family:'Space Mono',monospace;cursor:pointer;color:var(--muted);transition:all .2s;white-space:nowrap}
+.role-pill button.rp-seeking.active{background:var(--green);color:#000;border-radius:20px 0 0 20px}
+.role-pill button.rp-providing.active{background:var(--orange);color:#fff;border-radius:0 20px 20px 0}
+.role-pill button.rp-both.active{background:var(--surf3);color:var(--text);border-radius:0}
+/* LENS BADGE */
+.lens-badge{position:absolute;top:56px;right:12px;z-index:20;background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:4px 8px;font-size:9px;font-family:'Space Mono',monospace;color:var(--muted);line-height:1.4;text-align:right}
+.lens-badge span{display:block}
+.lens-badge .lb-radius{color:var(--text);font-weight:700}
+/* NODE visual weight transitions */
+.rnode{transition:left .5s ease,top .5s ease,opacity .4s ease}
+.rnode.corridor-match .nbub{box-shadow:0 0 0 3px rgba(255,255,255,0.18)}
+@keyframes corridor-pulse{0%{width:48px;height:48px;opacity:0.7}100%{width:72px;height:72px;opacity:0}}
+/* BEACON */
+@keyframes beacon-glow{0%,100%{opacity:0.35;transform:translate(-50%,-50%) scale(0.92)}50%{opacity:0.65;transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes beacon-reveal{0%{opacity:0.5;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes beacon-ripple{0%{width:40px;height:40px;opacity:0.55}100%{width:90px;height:90px;opacity:0}}
+.beacon-zone{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:6}
+.beacon-glow-ring{position:absolute;top:50%;left:50%;border-radius:50%;background:rgba(0,229,160,0.07);border:1.5px solid rgba(0,229,160,0.2);animation:beacon-glow 2.2s ease-in-out infinite;transform:translate(-50%,-50%)}
+.beacon-ripple{position:absolute;top:50%;left:50%;border-radius:50%;border:1.5px solid rgba(0,229,160,0.35);animation:beacon-ripple 2.2s ease-out infinite;transform:translate(-50%,-50%);pointer-events:none}
+.beacon-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;filter:blur(0.5px);animation:beacon-glow 2.2s ease-in-out infinite;z-index:7}
+.beacon-node{position:absolute;transform:translate(-50%,-50%);z-index:9;cursor:pointer;animation:beacon-reveal 0.6s ease-out}
+.beacon-node .nbub{border:2.5px solid var(--green)!important;background:rgba(0,229,160,0.18)!important}
+.beacon-label{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:9px;font-family:'Space Mono',monospace;white-space:nowrap;background:rgba(10,15,26,0.94);padding:2px 6px;border-radius:3px;color:var(--green);pointer-events:none}
+.beacon-badge{position:absolute;top:-6px;right:-6px;background:var(--green);color:#000;border:1.5px solid var(--bg);border-radius:8px;padding:1px 5px;font-size:8px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap}
+.bearing-hud{position:absolute;bottom:130px;right:12px;z-index:20;background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bearing-compass{width:44px;height:44px;position:relative;flex-shrink:0}
+.bearing-compass svg{width:44px;height:44px}
+.bearing-lbl{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center}
+.bearing-val{font-size:11px;color:var(--text);font-family:'Space Mono',monospace;font-weight:700;text-align:center}
+.hmeta{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace}
+.hval{font-size:9px;color:var(--text);font-family:'Space Mono',monospace;font-weight:700}
+.leg{position:absolute;top:54px;left:12px;z-index:20;display:flex;flex-direction:column;gap:3px}
+.li{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);font-family:'Space Mono',monospace}
+.lci{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.lsq{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.you{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none}
+.ycore{width:15px;height:15px;border-radius:50%;background:var(--green);border:2px solid #fff}
+.yping{position:absolute;top:50%;left:50%;border-radius:50%;border:2px solid var(--green);transform:translate(-50%,-50%);animation:ypng 1.6s ease-out infinite;opacity:0}
+@keyframes ypng{0%{width:14px;height:14px;opacity:.8}100%{width:50px;height:50px;opacity:0}}
+@keyframes pulse-r{0%{opacity:.9;transform:translate(-50%,-50%) scale(.88)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.07)}}
+@keyframes floatn{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes lock-pop{0%{transform:translate(-50%,-50%) scale(.2);opacity:1}100%{transform:translate(-50%,-50%) scale(2.5);opacity:0}}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes slideup{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.rnode{position:absolute;cursor:pointer;transform:translate(-50%,-50%);z-index:8;transition:left .5s ease,top .5s ease}
+.rnode:hover{z-index:16}
+.nbub{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px solid rgba(255,255,255,.12);transition:transform .15s,border-radius .4s;position:relative}
+.rnode:hover .nbub{transform:scale(1.1)}
+.nlbl{position:absolute;top:calc(100%+4px);left:50%;transform:translateX(-50%);font-size:9px;font-family:'Space Mono',monospace;white-space:nowrap;background:rgba(10,15,26,.94);padding:2px 5px;border-radius:3px;opacity:0;transition:opacity .15s;pointer-events:none;color:var(--text)}
+.rnode:hover .nlbl{opacity:1}
+.sbadge{position:absolute;top:-7px;right:-7px;min-width:16px;height:16px;border-radius:8px;border:1.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:'Space Mono',monospace;padding:0 3px;transition:background .3s}
+.pbadge{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);background:#1d4ed8;color:#bfdbfe;border:1.5px solid var(--bg);border-radius:5px;padding:1px 4px;font-size:8px;font-weight:700;font-family:'Space Mono',monospace;white-space:nowrap;animation:shimmer 2s ease-in-out infinite}
+.trail{position:absolute;width:4px;height:4px;border-radius:50%;opacity:.22;pointer-events:none;z-index:5}
+.rnotif{position:absolute;top:54px;left:50%;transform:translateX(-50%);background:var(--surf);border:1px solid var(--orange);border-radius:11px;padding:7px 12px;z-index:45;opacity:0;transition:opacity .3s;white-space:nowrap;display:flex;align-items:center;gap:7px;pointer-events:none}
+.rnotif.on{opacity:1;animation:slideup .3s ease}
+.rbottom{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:0 11px 11px}
+.wbar{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:8px 11px;margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.wlbl{font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.chips{display:flex;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{background:var(--surf2);border:1px solid var(--bdr);border-radius:20px;padding:3px 9px;font-size:11px;white-space:nowrap;cursor:pointer;transition:all .2s;color:var(--text);display:flex;align-items:center;gap:3px}
+.chip.on{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
+.cdot{width:4px;height:4px;border-radius:50%}
+.scanrow{display:flex;gap:7px}
+.bscan{flex:1;background:var(--green);color:#000;border:none;border-radius:10px;padding:11px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.bgo{background:var(--surf2);color:var(--text);border:1px solid var(--bdr);border-radius:10px;padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap}
+
+/* ITEM PANEL */
+.sdisp{background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:12px}
+.sunit{width:32px;height:32px;border-radius:7px;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .3s}
+.sunit.open{border-color:rgba(0,229,160,.5);background:rgba(0,229,160,.1)}
+.sunit.taken{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.07);opacity:.5}
+.pkstrip{background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:12px;margin-bottom:12px}
+.pkbtn{width:100%;border:none;border-radius:9px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s}
+.pkbtn.dopark{background:rgba(96,165,250,.14);color:#93c5fd;border:1px solid rgba(96,165,250,.3)}
+.pkbtn.dounpark{background:rgba(255,107,53,.12);color:#fdba74;border:1px solid rgba(255,107,53,.28)}
+.cwrap{border:1px solid var(--bdr);border-radius:12px;overflow:hidden;background:var(--surf2)}
+.chdr{padding:9px 11px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:7px}
+.cav{width:28px;height:28px;border-radius:50%;background:rgba(0,229,160,.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.msgs{padding:10px;display:flex;flex-direction:column;gap:6px;min-height:90px;max-height:130px;overflow-y:auto}
+.msg{max-width:78%;padding:7px 9px;border-radius:10px;font-size:12px;line-height:1.4;color:var(--text)}
+.msg.them{background:var(--surf);border-radius:3px 10px 10px 10px;align-self:flex-start}
+.msg.me{background:rgba(0,229,160,.13);border-radius:10px 3px 10px 10px;align-self:flex-end;color:var(--green)}
+.mtime{font-size:9px;color:var(--muted);margin-top:2px}
+.cirow{padding:8px 10px;border-top:1px solid var(--bdr);display:flex;gap:6px;align-items:center}
+.cinp{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:7px 12px;font-size:12px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif}
+.csend{background:var(--green);color:#000;border:none;border-radius:50%;width:30px;height:30px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+
+/* REVIEW */
+.rtabs{display:flex;gap:6px;margin-bottom:11px}
+.rtab{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:7px;font-size:11px;text-align:center;cursor:pointer;color:var(--muted);font-family:'Space Mono',monospace;transition:all .2s}
+.rtab.on{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
+.star-row{display:flex;gap:8px;justify-content:center;margin-bottom:9px;transition:all .4s ease}
+.sitem{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .35s}
+.sitem svg path{fill:none;stroke:var(--muted);stroke-width:1.8;transition:all .3s;stroke-linejoin:round;stroke-linecap:round}
+.sitem.sel svg path{fill:var(--text);stroke:var(--text)}
+.sitem .semoji{font-size:13px;transition:transform .2s}
+.sitem.sel .semoji{transform:scale(1.18)}
+.sitem .smng{font-size:8px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center;transition:color .2s;max-width:42px}
+.sitem.sel .smng{color:var(--text)}
+.autocomment{background:var(--surf);border:1px solid var(--bdr2);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--muted);line-height:1.5;min-height:40px;font-style:italic;transition:all .3s}
+.autocomment.live{color:var(--text);border-color:rgba(0,229,160,.22);font-style:normal}
+.subbtn{width:100%;background:var(--green);color:#000;border:none;border-radius:9px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-top:9px;display:none}
+.subbtn.show{display:block}
+
+/* TYPE GRID */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.topt{background:var(--surf2);border:2px solid var(--bdr);border-radius:11px;padding:10px 7px;cursor:pointer;text-align:center;transition:all .2s}
+.topt.sel{border-color:var(--orange);background:rgba(255,107,53,.07)}
+.topt-ico{font-size:18px;margin-bottom:3px}
+.topt-lbl{font-size:11px;font-weight:500;color:var(--text)}
+.topt-desc{font-size:10px;color:var(--muted);margin-top:1px;line-height:1.3}
+.sadj{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.sadjbtn{background:var(--surf);border:1px solid var(--bdr);border-radius:7px;width:28px;height:28px;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sadjnum{font-size:19px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);min-width:24px;text-align:center}
+
+/* PROFILE */
+.pav{width:60px;height:60px;border-radius:50%;background:rgba(0,229,160,.14);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--green);font-family:'Space Mono',monospace;flex-shrink:0}
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.scard{background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;padding:9px;text-align:center}
+.snum{font-size:19px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text)}
+.slbl{font-size:10px;color:var(--muted);margin-top:1px}
+.mopt{flex:1;background:var(--surf2);border:2px solid var(--bdr);border-radius:10px;padding:10px 7px;cursor:pointer;text-align:center;transition:all .2s}
+.mopt.b-on{border-color:var(--green);background:rgba(0,229,160,.07)}
+.mopt.s-on{border-color:var(--orange);background:rgba(255,107,53,.07)}
+.listitem{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;cursor:pointer;transition:border-color .15s}
+.listitem:hover{border-color:var(--bdr2)}
+.liico{font-size:20px;width:38px;height:38px;background:var(--surf);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.liinfo{flex:1;min-width:0}
+.liname{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lisub{font-size:10px;color:var(--muted);margin-top:1px}
+.revitem{padding:10px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px}
+.chat-prev{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;cursor:pointer}
+.cp-av{width:36px;height:36px;border-radius:50%;background:rgba(0,229,160,.14);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--green);flex-shrink:0}
+.undot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+/* PORTFOLIO SCREEN */
+.port-seg{margin-bottom:4px}
+.seg-hdr{display:flex;align-items:center;padding:11px 14px;cursor:pointer;user-select:none;border-radius:12px;transition:background .15s;gap:8px}
+.seg-hdr:hover{background:var(--surf2)}
+.seg-icon{font-size:15px}
+.seg-name{font-size:13px;font-weight:600;color:var(--text)}
+.seg-count{font-size:10px;font-family:'Space Mono',monospace;padding:2px 7px;border-radius:10px}
+.seg-chevron{font-size:11px;color:var(--muted);transition:transform .2s;margin-left:auto}
+.seg-chevron.open{transform:rotate(180deg)}
+.seg-body{padding:0 4px 10px;display:flex;flex-direction:column;gap:7px}
+.seg-body.hidden{display:none}
+.port-item{background:var(--surf2);border:1px solid var(--bdr);border-radius:11px;padding:10px 11px;display:flex;align-items:center;gap:9px}
+.pi-ico{font-size:18px;width:34px;height:34px;background:var(--surf);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pi-info{flex:1;min-width:0}
+.pi-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.pi-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.spill{border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap;font-family:'Space Mono',monospace}
+.sp-n{background:rgba(0,229,160,.12);color:var(--green);border-color:rgba(0,229,160,.3)}
+.sp-o{background:rgba(255,107,53,.12);color:#fdba74;border-color:rgba(255,107,53,.3)}
+.sp-v{background:var(--surf);color:var(--muted);border-color:var(--bdr)}
+.pi-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:3px;transition:color .15s}
+.pi-del:hover{color:var(--red)}
+.port-add{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:none;border:1px dashed var(--bdr2);border-radius:10px;cursor:pointer;font-size:12px;color:var(--muted);transition:all .2s;width:100%}
+.port-add:hover{border-color:var(--green);color:var(--green)}
+.seg-locked{padding:11px 14px;background:rgba(255,255,255,.02);border:1px dashed var(--bdr);border-radius:10px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+.atab{flex:1;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:6px;font-size:11px;text-align:center;cursor:pointer;color:var(--muted);font-family:'Space Mono',monospace;transition:all .2s}
+.atab.an{background:rgba(0,229,160,.1);border-color:var(--green);color:var(--green)}
+.atab.ao{background:rgba(255,107,53,.1);border-color:var(--orange);color:#fdba74}
+.atab.av{background:var(--surf2);border-color:var(--bdr2);color:var(--text)}
 </style>
 </head>
 <body>
 <div id="shell">
 <div id="view">
 
-<!-- ══ ASSETS TAB ══ -->
-<div id="s-assets" class="screen active">
-  <div class="topbar">
-    <div class="page-title">Assets</div>
+<!-- ══ RADAR ══ -->
+<div id="s-radar" class="screen active">
+  <canvas id="mc"></canvas>
+  <div class="rtopbar">
+    <div class="logo">need<b>ed</b></div>
+    <div class="role-pill" id="role-pill">
+      <button class="rp-seeking active" id="rp-seeking" onclick="LENS.setRole('seeking')">Seeking</button>
+      <button class="rp-both" id="rp-both" onclick="LENS.setRole('both')">Both</button>
+      <button class="rp-providing" id="rp-providing" onclick="LENS.setRole('providing')">Providing</button>
+    </div>
+    <div class="hud">
+      <div class="hrow"><div class="hdot" id="hdot"></div><span class="hname" id="hname">walking</span></div>
+      <div class="hmeta" id="hspd">1.1 m/s · auto</div>
+      <div class="hrow" style="gap:3px"><span class="hmeta">active</span><span class="hval" id="elapsed">0:00</span></div>
+    </div>
   </div>
-  
-  <!-- Segmented: My Assets | Store -->
-  <div class="segmented" id="assets-seg">
-    <div class="segbtn on" id="seg-myassets" onclick="switchAssetsTab(0)">My Assets</div>
-    <div class="segbtn" id="seg-store" onclick="switchAssetsTab(1)">Store</div>
+  <div class="lens-badge" id="lens-badge">
+    <span class="lb-radius" id="lb-radius">200m</span>
+    <span id="lb-mode">walking lens</span>
+  </div>
+  <div class="leg">
+    <div class="li"><div class="lsq" style="background:rgba(96,165,250,.2);border:1px solid rgba(96,165,250,.4)"></div>fixed</div>
+    <div class="li"><div class="lci" style="background:#ff6b35"></div>hawker</div>
+    <div class="li"><div class="lci" style="background:#f59e0b"></div>keke/truck</div>
+    <div class="li"><div class="lci" style="background:#a78bfa"></div>okada/moto</div>
+    <div class="li"><div class="lci" style="background:#2dd4bf;border:1.5px dashed #2dd4bf"></div>parked</div><div class="li"><div style="width:7px;height:7px;border-radius:50%;border:1.5px solid #00e5a0;background:rgba(0,229,160,0.15);flex-shrink:0"></div>beacon</div>
+  </div>
+  <div id="rings" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4"></div>
+  <div class="you"><div class="yping"></div><div class="ycore"></div></div>
+  <div id="nodes"></div>
+  <div id="trails"></div>
+  <div class="rnotif" id="rnotif">
+    <span id="rni" style="font-size:15px">🛺</span>
+    <div><div style="font-size:11px;color:var(--text);font-weight:500" id="rnt">entered radar</div><div style="font-size:10px;color:var(--muted)" id="rns">nearby</div></div>
+  </div>
+  <div   <!-- BEARING HUD -->
+  <div class="bearing-hud" id="bearing-hud">
+    <div class="bearing-compass">
+      <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="20" fill="none" stroke="#1e2d45" stroke-width="1.5"/>
+        <text x="22" y="8" text-anchor="middle" font-size="7" fill="#8892a4" font-family="monospace">N</text>
+        <text x="22" y="40" text-anchor="middle" font-size="7" fill="#8892a4" font-family="monospace">S</text>
+        <text x="6" y="25" text-anchor="middle" font-size="7" fill="#8892a4" font-family="monospace">W</text>
+        <text x="39" y="25" text-anchor="middle" font-size="7" fill="#8892a4" font-family="monospace">E</text>
+        <line id="bearing-needle" x1="22" y1="22" x2="22" y2="5" stroke="#00e5a0" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="bearing-val" id="bearing-deg">45&#176;</div>
+    <div class="bearing-lbl">your heading</div>
+    <input type="range" min="0" max="359" value="45" step="1" id="bearing-slider" style="width:60px;margin-top:2px" oninput="setBearing(this.value)">
+  </div>
+  class="rbottom">
+    <div class="wbar">
+      <span class="wlbl">Wishlist</span>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="scanrow">
+      <button class="bscan" onclick="doScan()">◉ Scan nearby</button>
+      <button class="bgo" onclick="P.open('p-golive')">＋ Go live</button>
+    </div>
   </div>
 
-  <!-- My Assets (original portfolio) -->
-  <div id="assets-my" class="scrollbody" style="padding-top:8px">
+  <!-- ITEM PANEL -->
+  <div class="panel" id="p-item">
+    <div class="sheet">
+      <button class="shclose" onclick="P.close('p-item')">✕</button>
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:9px">
+        <span style="font-size:26px" id="ii-ico">🛺</span>
+        <div><div style="font-size:15px;font-weight:600" id="ii-title">Item</div><div style="font-size:11px;color:var(--muted);margin-top:1px" id="ii-sub">—</div></div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px" id="ii-tags"></div>
+      <div id="ii-seats"></div>
+      <div id="ii-park"></div>
+      <div class="cwrap">
+        <div class="chdr">
+          <div class="cav" id="c-av">?</div>
+          <div><div style="font-size:12px;font-weight:500;color:var(--text)" id="c-name">—</div><div style="font-size:10px;color:var(--green)"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:2px"></span>online</div></div>
+        </div>
+        <div class="msgs" id="msgs"></div>
+        <div class="cirow">
+          <input class="cinp" id="cinp" placeholder="Ask about this item…" onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="csend" onclick="sendMsg()">↑</button>
+        </div>
+      </div>
+      <div id="ii-acts" style="margin-top:0"></div>
+      <!-- REVIEW SECTION -->
+      <div style="margin-top:14px;border-top:1px solid var(--bdr);padding-top:13px">
+        <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Leave a review</div>
+        <div class="rtabs">
+          <div class="rtab on" id="rt-item" onclick="switchRTab('item')">Rate item</div>
+          <div class="rtab" id="rt-seller" onclick="switchRTab('seller')">Rate seller</div>
+        </div>
+        <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:13px">
+          <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:11px" id="rev-title">How was the item?</div>
+          <div class="star-row" id="star-row"></div>
+          <div class="autocomment" id="autocomment">Tap stars to build your review…</div>
+          <button class="subbtn" id="subbtn" onclick="submitReview()">Submit review ↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GO LIVE PANEL -->
+  <div class="panel" id="p-golive">
+    <div class="sheet">
+      <button class="shclose" onclick="P.close('p-golive')">✕</button>
+      <div style="font-size:14px;font-weight:600;margin-bottom:2px">Go live on the map</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:13px">Choose how you're listing</div>
+      <div class="tgrid" id="gl-tgrid"></div>
+      <div id="gl-goods-f"><div class="flabel">Item name</div><input class="finp" id="gl-name" placeholder="e.g. Fresh zobo, Ankara, Tomatoes…"></div>
+      <div id="gl-route-f" style="display:none"><div class="flabel">Route / destination</div><input class="finp" id="gl-route" placeholder="e.g. Surulere → Yaba"></div>
+      <div id="gl-seats-f" style="display:none">
+        <div class="flabel">Available seats / capacity</div>
+        <div class="sadj"><button class="sadjbtn" onclick="GL.adjSeats(-1)">−</button><span class="sadjnum" id="gl-snum">2</span><button class="sadjbtn" onclick="GL.adjSeats(1)">+</button><span style="font-size:11px;color:var(--muted)" id="gl-smax">max 3</span></div>
+      </div>
+      <div class="flabel">Price / fare per seat</div>
+      <input class="finp" id="gl-price" placeholder="e.g. ₦500">
+      <div id="gl-park-ctrl" style="display:none">
+        <div class="pkstrip">
+          <div style="font-size:10px;color:#93c5fd;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">📍 Location mode</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:9px" id="gl-pkbody">Your item moves with your phone.</div>
+          <button class="pkbtn dopark" id="gl-pkbtn" onclick="GL.togglePark()">📍 Park & lock coordinates</button>
+        </div>
+      </div>
+      <button class="bigbtn btn-orange" onclick="GL.post()">📍 Go live on the map</button>
+    </div>
+  </div>
+
+  <!-- DRIVER PANEL (from profile) -->
+  <div class="panel" id="p-driver">
+    <div class="sheet">
+      <button class="shclose" onclick="P.close('p-driver')">✕</button>
+      <div style="font-size:14px;font-weight:600;margin-bottom:11px">Driver controls</div>
+      <div id="drv-info" style="background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:11px"></div>
+      <div class="pkstrip">
+        <div style="font-size:10px;color:#93c5fd;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">📍 Location mode</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:9px" id="drv-pkbody">Moving with your phone.</div>
+        <button class="pkbtn dopark" id="drv-pkbtn" onclick="DRV.togglePark()">📍 Park & lock coordinates</button>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:12px">
+        <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">Update seats / capacity</div>
+        <div class="sadj"><button class="sadjbtn" onclick="DRV.adjSeats(-1)">−</button><span class="sadjnum" id="drv-snum">2</span><button class="sadjbtn" onclick="DRV.adjSeats(1)">+</button><span style="font-size:11px;color:var(--muted)" id="drv-shint">of 3</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WISHLIST ══ -->
+<div id="s-portfolio" class="screen">
+  <div style="padding:12px 14px 6px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
+    <div><div class="page-title">Portfolio</div><div class="page-sub">Your live intentions on the map</div></div>
+    <button onclick="PORT.openAdd(null)" style="background:var(--green);color:#000;border:none;border-radius:9px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer">＋ Add</button>
+  </div>
+  <div class="scrollbody" style="padding-top:8px">
+
     <!-- SEGMENT A: NEEDED -->
     <div class="port-seg" id="seg-needed">
       <div class="seg-hdr" onclick="PORT.toggleSeg('needed')">
         <span class="seg-icon">🔍</span>
         <span class="seg-name">Needed</span>
         <span class="seg-count sp-n" id="seg-needed-count">0</span>
+        <span style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;margin-left:2px">tap 📡 to broadcast</span>
         <span class="seg-chevron open" id="chev-needed">▾</span>
       </div>
       <div class="seg-body" id="seg-needed-body"></div>
     </div>
 
-    <!-- SEGMENT B: OFFERING -->
+    <!-- SEGMENT B: OFFERING — hidden if pure seeker -->
     <div class="port-seg" id="seg-offering">
       <div class="seg-hdr" onclick="PORT.toggleSeg('offering')">
         <span class="seg-icon">📡</span>
@@ -138,7 +439,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
       <div class="seg-body" id="seg-offering-body"></div>
     </div>
 
-    <!-- SEGMENT C: VAULT -->
+    <!-- SEGMENT C: VAULT — hidden if pure seeker -->
     <div class="port-seg" id="seg-vault">
       <div class="seg-hdr" onclick="PORT.toggleSeg('vault')">
         <span class="seg-icon">🗄️</span>
@@ -149,213 +450,1405 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
       <div class="seg-body hidden" id="seg-vault-body"></div>
     </div>
 
-    <div class="ui-note" style="bottom:80px;left:14px">Needed items broadcast demand beacons on Radar.<br>Offering = live supply nodes.<br>Vault = hidden until activated.</div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:6px 4px 4px">
+      <b style="color:var(--green)">Needed</b> items broadcast your demand on the radar. <b style="color:#fdba74">Offering</b> items are your live supply nodes. <b style="color:var(--muted)">Vault</b> items are invisible — go live when ready.
+    </div>
   </div>
 
-  <!-- Store Tab (Mock Digital Twins) -->
-  <div id="assets-store" class="scrollbody" style="display:none;padding-top:8px">
+  <!-- ADD ITEM PANEL -->
+  <div class="panel" id="p-additem">
+    <div class="sheet">
+      <button class="shclose" onclick="P.close('p-additem')">✕</button>
+      <div style="font-size:14px;font-weight:600;margin-bottom:3px">Add to portfolio</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Choose segment, then fill in details</div>
+      <div style="display:flex;gap:6px;margin-bottom:13px" id="add-seg-tabs">
+        <button class="atab an" id="atab-needed" onclick="PORT.setAddSeg('needed')">Needed</button>
+        <button class="atab" id="atab-offering" onclick="PORT.setAddSeg('offering')">Offering</button>
+        <button class="atab" id="atab-vault" onclick="PORT.setAddSeg('vault')">Vault</button>
+      </div>
+      <!-- NEEDED fields -->
+      <div id="add-needed-f">
+        <div class="flabel">What are you looking for?</div>
+        <input class="finp" id="add-n-name" placeholder="e.g. Zobo, Okada to Yaba, Ankara fabric…">
+        <div class="flabel">Destination / route (optional)</div>
+        <input class="finp" id="add-n-dest" placeholder="e.g. heading to Yaba">
+      </div>
+      <!-- OFFERING fields -->
+      <div id="add-offering-f" style="display:none">
+        <div class="tgrid" id="add-vtype-grid"></div>
+        <div id="add-o-goods-f"><div class="flabel">Item name</div><input class="finp" id="add-o-name" placeholder="e.g. Fresh zobo, Ankara…"></div>
+        <div id="add-o-route-f" style="display:none"><div class="flabel">Route / destination</div><input class="finp" id="add-o-route" placeholder="e.g. Surulere → Yaba"></div>
+        <div id="add-o-seats-f" style="display:none">
+          <div class="flabel">Capacity / seats</div>
+          <div class="sadj"><button class="sadjbtn" onclick="PORT.adjSeats(-1)">−</button><span class="sadjnum" id="add-o-snum">2</span><button class="sadjbtn" onclick="PORT.adjSeats(1)">+</button><span style="font-size:11px;color:var(--muted)" id="add-o-smax">max 3</span></div>
+        </div>
+        <div class="flabel">Price / fare</div>
+        <input class="finp" id="add-o-price" placeholder="e.g. ₦500">
+      </div>
+      <!-- VAULT fields -->
+      <div id="add-vault-f" style="display:none">
+        <div class="tgrid" id="add-vt-vtype-grid"></div>
+        <div id="add-v-goods-f"><div class="flabel">Item name</div><input class="finp" id="add-v-name" placeholder="e.g. My suya stall, 30 units ankara…"></div>
+        <div id="add-v-route-f" style="display:none"><div class="flabel">Default route</div><input class="finp" id="add-v-route" placeholder="e.g. Surulere → Yaba"></div>
+        <div id="add-v-seats-f" style="display:none">
+          <div class="flabel">Capacity</div>
+          <div class="sadj"><button class="sadjbtn" onclick="PORT.adjVSeats(-1)">−</button><span class="sadjnum" id="add-v-snum">2</span><button class="sadjbtn" onclick="PORT.adjVSeats(1)">+</button><span style="font-size:11px;color:var(--muted)" id="add-v-smax">max 3</span></div>
+        </div>
+        <div class="flabel">Price / fare</div>
+        <input class="finp" id="add-v-price" placeholder="e.g. ₦500">
+      </div>
+      <button class="bigbtn btn-green" onclick="PORT.addItem()" style="margin-top:4px">Add to portfolio</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ACTIVITY ══ -->
+<div id="s-activity" class="screen">
+  <div class="topbar"><div><div class="page-title">Activity</div><div class="page-sub">Chats, bookings & transactions</div></div></div>
+  <div class="scrollbody">
+    <div class="card"><div class="card-title">Recent chats</div><div style="display:flex;flex-direction:column;gap:7px" id="act-chats"></div></div>
+    <div class="card"><div class="card-title">Bookings</div><div id="act-bookings"></div></div>
     <div class="card">
-      <div class="card-title">Digital Product Twins • Lagos Creators</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="store-grid"></div>
+      <div class="card-title">Transactions</div>
+      <div class="row"><span class="row-l">Keke seat · Yaba</span><span class="row-r" style="color:var(--red)">−₦150</span></div>
+      <div class="row"><span class="row-l">Zobo sold ×3</span><span class="row-r" style="color:var(--green)">+₦600</span></div>
+      <div class="row"><span class="row-l">Suya purchase</span><span class="row-r" style="color:var(--red)">−₦500</span></div>
+      <div class="row"><span class="row-l">Truck delivery ×1</span><span class="row-r" style="color:var(--green)">+₦3,500</span></div>
     </div>
-    <div class="ui-note" style="top:140px;left:14px">Store simulates acquiring Digital Twins (DPs) from local creators.<br>Tap "Get" → clones into your Needed list.</div>
   </div>
 </div>
 
-<!-- ══ RADAR TAB (Center) ══ -->
-<div id="s-radar" class="screen">
-  <div class="topbar" style="justify-content:space-between">
-    <div class="page-title">Radar</div>
-    <div class="segmented" style="margin:0;width:160px">
-      <div class="segbtn on" id="radar-seg-radar" onclick="switchRadarTab(0)">Radar</div>
-      <div class="segbtn" id="radar-seg-social" onclick="switchRadarTab(1)">Social</div>
+<!-- ══ PROFILE ══ -->
+<div id="s-profile" class="screen">
+  <div class="topbar"><div><div class="page-title">Profile</div><div class="page-sub">Your identity on needed</div></div></div>
+  <div class="scrollbody">
+    <!-- identity -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:11px">
+        <div class="pav" id="p-av">AO</div>
+        <div>
+          <div style="font-size:15px;font-weight:600" id="p-name">Adeola O.</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">Lagos Island · since 2024</div>
+          <div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap" id="p-badges"></div>
+        </div>
+      </div>
+      <div class="sgrid">
+        <div class="scard"><div class="snum" id="p-rating">4.8</div><div class="slbl">avg rating</div></div>
+        <div class="scard"><div class="snum" id="p-reviews">47</div><div class="slbl">reviews</div></div>
+        <div class="scard"><div class="snum" id="p-txns">132</div><div class="slbl">transactions</div></div>
+      </div>
     </div>
-  </div>
-
-  <!-- Radar Map -->
-  <div id="radar-map" style="flex:1;position:relative">
-    <canvas id="mc"></canvas>
-    <!-- All existing radar elements (rtopbar, lens-badge, leg, rings, you, nodes, trails, rnotif, bearing-hud, rbottom, panels) remain here -->
-    <!-- ... (keeping every radar canvas, nodes, beacons, bearing, wishlist chips, scan button, etc. unchanged) ... -->
-    <div id="needed-status-circles" style="position:absolute;top:70px;left:14px;display:flex;gap:8px;z-index:25"></div>
-  </div>
-
-  <!-- Social Feed (mock) -->
-  <div id="radar-social" class="scrollbody" style="display:none">
-    <div class="card"><div class="card-title">Creator Feed</div><!-- mock posts --></div>
-    <div class="card"><div class="card-title">Direct Chats</div><!-- mock chat list --></div>
-    <div class="ui-note" style="top:100px;left:14px">Social feed from creators + WhatsApp-style chats.<br>Needed items trigger status circles above.</div>
-  </div>
-
-  <!-- Keep all existing panels: p-item, p-golive, p-driver, p-additem -->
-</div>
-
-<!-- ══ ME TAB (Activity + Profile merged) ══ -->
-<div id="s-me" class="screen">
-  <div class="topbar">
-    <div class="page-title">Me</div>
-  </div>
-  
-  <div class="segmented" id="me-seg" style="margin:8px 14px">
-    <div class="segbtn on" id="me-seg-activity" onclick="switchMeTab(0)">Activity</div>
-    <div class="segbtn" id="me-seg-profile" onclick="switchMeTab(1)">Profile</div>
-  </div>
-
-  <!-- Activity View -->
-  <div id="me-activity" class="scrollbody">
-    <div class="card"><div class="card-title">Recent chats</div><div id="act-chats"></div></div>
-    <div class="card"><div class="card-title">Bookings & Transactions</div><div id="act-bookings"></div></div>
-  </div>
-
-  <!-- Profile View -->
-  <div id="me-profile" class="scrollbody" style="display:none">
-    <!-- All original profile content: identity, roles, vehicles, listings, reviews, settings -->
+    <!-- dual role -->
+    <div class="card">
+      <div class="card-title">I am currently…</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:9px">You can be both buyer and seller at the same time</div>
+      <div style="display:flex;gap:7px;margin-bottom:8px">
+        <div class="mopt b-on" id="m-buyer" onclick="PROF.setRole('buyer',this)">
+          <div style="font-size:18px;margin-bottom:3px">🛍️</div>
+          <div style="font-size:11px;font-weight:500;color:var(--green)">Buyer</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">Discover items</div>
+        </div>
+        <div class="mopt s-on" id="m-seller" onclick="PROF.setRole('seller',this)">
+          <div style="font-size:18px;margin-bottom:3px">🏪</div>
+          <div style="font-size:11px;font-weight:500;color:var(--orange)">Seller</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">List goods & services</div>
+        </div>
+        <div class="mopt" id="m-driver" onclick="PROF.setRole('driver',this)">
+          <div style="font-size:18px;margin-bottom:3px">🚗</div>
+          <div style="font-size:11px;font-weight:500">Driver</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">Offer transport</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;line-height:1.5" id="role-desc">You can discover items nearby and book transport. Tap Seller or Driver to also list your own goods or vehicle.</div>
+    </div>
+    <!-- vehicle -->
+    <div class="card" id="vehicle-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0">My vehicles</div>
+        <button onclick="PROF.addVehicle()" style="background:rgba(255,107,53,.1);color:#fdba74;border:1px solid rgba(255,107,53,.25);border-radius:7px;padding:3px 9px;font-size:11px;cursor:pointer">+ Add</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px" id="vehicle-list"></div>
+    </div>
+    <!-- my listings -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0">My listings</div>
+        <button onclick="showTab('portfolio')" style="background:rgba(255,107,53,.1);color:#fdba74;border:1px solid rgba(255,107,53,.25);border-radius:7px;padding:3px 9px;font-size:11px;cursor:pointer">+ New</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px" id="p-listings"></div>
+    </div>
+    <!-- reviews received -->
+    <div class="card">
+      <div class="card-title">Reviews received</div>
+      <div style="display:flex;flex-direction:column;gap:9px" id="p-revs"></div>
+    </div>
+    <!-- settings -->
+    <div class="card">
+      <div class="card-title">Settings</div>
+      <div class="row"><span class="row-l">Phone</span><span class="row-r">+234 ••• 4521</span></div>
+      <div class="row"><span class="row-l">Radar radius</span><span class="row-r">Auto (speed-based)</span></div>
+      <div class="row"><span class="row-l">Notifications</span><span class="row-r" style="color:var(--green)">On</span></div>
+      <div class="row"><span class="row-l">Offline cache</span><span class="row-r">Last sync 2m ago</span></div>
+      <div class="row"><span class="row-l">App version</span><span class="row-r">needed v3</span></div>
+    </div>
   </div>
 </div>
 
 </div><!-- /view -->
 
-<!-- BOTTOM NAV - 3 TABS -->
+<!-- BOTTOM NAV -->
 <div id="bnav">
-  <button class="nb on" id="tab-assets" onclick="showTab('assets')"><span class="ni">⊞</span><span class="nl">Assets</span><div class="nd"></div></button>
-  <button class="nb" id="tab-radar" onclick="showTab('radar')"><span class="ni">◎</span><span class="nl">Radar</span><div class="nd"></div></button>
-  <button class="nb" id="tab-me" onclick="showTab('me')"><span class="ni">◯</span><span class="nl">Me</span><div class="nd"></div></button>
+  <button class="nb on" id="tab-radar" onclick="showTab('radar')"><span class="ni">◎</span><span class="nl">Radar</span><div class="nd"></div></button>
+  <button class="nb" id="tab-portfolio" onclick="showTab('portfolio')"><span class="ni">⊞</span><span class="nl">Portfolio</span><div class="nd"></div></button>
+  <button class="nb" id="tab-activity" onclick="showTab('activity')"><span class="ni">◷</span><span class="nl">Activity</span><div class="nd"></div></button>
+  <button class="nb" id="tab-profile" onclick="showTab('profile')"><span class="ni">◯</span><span class="nl">Profile</span><div class="nd"></div></button>
 </div>
 </div>
 
 <script>
-// === CORE LOGIC (Lens, Corridor Matching, Beacons, Portfolio, etc.) REMAINS 100% UNCHANGED ===
-// All existing variables, functions (LENS, PORT, renderAll, moveItem, renderBeacons, etc.) are kept intact.
+/* ═══════════════ CONSTANTS ═══════════════ */
+var W=function(){return window.innerWidth};
+var H=function(){return window.innerHeight};
+var CX=function(){return W()/2};
+var CY=function(){return (H()-56)/2};
 
-// NEW NAVIGATION STATE
-let currentAssetsTab = 0;
-let currentRadarTab = 0;
-let currentMeTab = 0;
+/* vehicle type definitions */
+var VTYPES=[
+  {id:'fixed',icon:'🏪',label:'Fixed stall',desc:'Doesn\'t move',color:'#60a5fa',isTransport:false,isMoving:false},
+  {id:'hawk',icon:'🚶',label:'Hawking',desc:'Walk with goods',color:'#ff6b35',isTransport:false,isMoving:true},
+  {id:'keke',icon:'🛺',label:'Keke napep',desc:'3-wheel taxi',color:'#f59e0b',isTransport:true,isMoving:true,maxSeats:3,defaultSeats:2},
+  {id:'okada',icon:'🏍️',label:'Okada',desc:'Motorcycle taxi',color:'#a78bfa',isTransport:true,isMoving:true,maxSeats:1,defaultSeats:1},
+  {id:'motorcycle',icon:'🏍️',label:'Motorcycle',desc:'Delivery / goods',color:'#a78bfa',isTransport:true,isMoving:true,maxSeats:1,defaultSeats:1},
+  {id:'truck',icon:'🚛',label:'Truck / lorry',desc:'Large delivery',color:'#2dd4bf',isTransport:true,isMoving:true,maxSeats:2,defaultSeats:1},
+  {id:'car',icon:'🚗',label:'Car / taxi',desc:'Private car hire',color:'#f472b6',isTransport:true,isMoving:true,maxSeats:4,defaultSeats:3},
+  {id:'van',icon:'🚐',label:'Van / minibus',desc:'Group transport',color:'#fb923c',isTransport:true,isMoving:true,maxSeats:12,defaultSeats:8},
+  {id:'bicycle',icon:'🚲',label:'Bicycle',desc:'Local delivery',color:'#a3e635',isTransport:false,isMoving:true,maxSeats:1,defaultSeats:1},
+  {id:'boat',icon:'⛵',label:'Boat / canoe',desc:'Water transport',color:'#38bdf8',isTransport:true,isMoving:true,maxSeats:6,defaultSeats:4},
+];
 
-function switchAssetsTab(n) {
-  currentAssetsTab = n;
-  document.getElementById('seg-myassets').classList.toggle('on', n===0);
-  document.getElementById('seg-store').classList.toggle('on', n===1);
-  document.getElementById('assets-my').style.display = n===0 ? 'block' : 'none';
-  document.getElementById('assets-store').style.display = n===1 ? 'block' : 'none';
-  if (n===1) buildStoreGrid();
+function vtype(id){return VTYPES.find(function(v){return v.id===id;})||VTYPES[0];}
+
+/* ═══════════════ SAMPLE DATA ═══════════════ */
+var mobiles=[
+  {id:'k1',icon:'🛺',label:'Keke — Yaba',seller:'Musa D.',av:'MD',price:'₦150/seat',color:'#f59e0b',vt:'keke',route:{origin:'Surulere',destination:'Yaba',bearing:45},totalSeats:3,seats:2,angle:42,dist:155,vAngle:225,speed:2.5,parked:false,msgs:[{m:false,t:'Going Yaba now, 2 seats left! 🛺'}]},
+  {id:'o1',icon:'🏍️',label:'Okada — CMS',seller:'Kayode B.',av:'KB',price:'₦200',color:'#a78bfa',vt:'okada',route:{origin:'',destination:'CMS Marina',bearing:130},totalSeats:1,seats:1,angle:295,dist:135,vAngle:130,speed:3.6,parked:false,msgs:[{m:false,t:'Going CMS, hop on! 🏍️'}]},
+  {id:'tr1',icon:'🚛',label:'Truck — Apapa',seller:'Chukwu T.',av:'CT',price:'₦3,500',color:'#2dd4bf',vt:'truck',route:{origin:'',destination:'Apapa Port',bearing:340},totalSeats:2,seats:1,angle:165,dist:195,vAngle:340,speed:1.8,parked:false,msgs:[{m:false,t:'Heading Apapa, space for cargo + 1 pass!'}]},
+  {id:'h1',icon:'🧃',label:'Cold zobo',seller:'Amaka K.',av:'AK',price:'₦200',color:'#10b981',vt:'hawk',route:{origin:'',destination:'',bearing:195},angle:90,dist:160,vAngle:195,speed:1.0,parked:false,msgs:[{m:false,t:'Cold zobo! 🥤 Where you dey?'}]},
+  {id:'h2',icon:'🌽',label:'Roasted corn',seller:'Ngozi M.',av:'NM',price:'₦300',color:'#f472b6',vt:'hawk',route:{origin:'',destination:'',bearing:290},angle:150,dist:195,vAngle:290,speed:0.9,parked:false,msgs:[{m:false,t:'Hot corn, just done!'}]},
+  {id:'ca1',icon:'🚗',label:'Car — VI',seller:'Bayo A.',av:'BA',price:'₦800',color:'#f472b6',vt:'car',route:{origin:'',destination:'Victoria Island',bearing:50},totalSeats:4,seats:3,angle:220,dist:170,vAngle:50,speed:3.2,parked:false,msgs:[{m:false,t:'Going VI, 3 seats available'}]},
+];
+var fixeds=[
+  {id:'f1',icon:'🥩',label:'Suya spot',seller:'Ibrahim S.',av:'IS',price:'₦500',color:'#ff6b35',vt:'fixed',route:{origin:'',destination:'',bearing:null},dist:78,angle:325,msgs:[{m:false,t:'Fresh suya ready! 🔥'}]},
+  {id:'f2',icon:'👗',label:'Ankara fabric',seller:'Chisom A.',av:'CA',price:'₦2,500',color:'#a78bfa',vt:'fixed',route:{origin:'',destination:'',bearing:null},dist:105,angle:178,msgs:[{m:false,t:'Which pattern do you want?'}]},
+];
+
+var allItems=fixeds.concat(mobiles); /* will be re-derived after portfolio loads */
+var myVehicles=[
+  {id:'mv1',icon:'🛺',label:'My Keke',vt:'keke',plate:'LND 482 KJ',totalSeats:3,seats:2,parked:false},
+];
+
+/* state */
+var activeItem=null;
+var driverItem=myVehicles[0];
+var elapsedSec=0;
+var trailTick=0;
+var speedSamples=[];
+var revTab='item';
+var revTimer=null;
+
+/* ═══════════════ LENS — speed controls scale only ═══════════════ */
+var LENS={
+  /* current lens config — driven purely by speed */
+  mode:'walk',          /* 'walk' | 'ride' | 'drive' — for display only */
+  speed:1.1,
+  radarRadius:220,      /* px — ring scale */
+  distanceScale:0.92,   /* node positioning multiplier */
+  detailLevel:'high',   /* 'high' | 'medium' | 'low' */
+  /* ring color is driven by userRole, not speed */
+
+  CONFIGS:{
+    walk:  {label:'walking lens',  radius:220, scale:0.92, detail:'high',  distM:200,  notifLead:5},
+    ride:  {label:'riding lens',   radius:340, scale:0.88, detail:'medium',distM:500,  notifLead:12},
+    drive: {label:'driving lens',  radius:480, scale:0.82, detail:'low',   distM:2000, notifLead:30},
+  },
+
+  ingestSpeed:function(mps){
+    LENS.speed=mps;
+    speedSamples.push(mps);
+    if(speedSamples.length>6)speedSamples.shift();
+    var avg=speedSamples.reduce(function(a,b){return a+b;},0)/speedSamples.length;
+    var detected=avg<3?'walk':avg<10?'ride':'drive';
+    if(detected!==LENS.mode){
+      LENS.mode=detected;
+      var cfg=LENS.CONFIGS[detected];
+      LENS.radarRadius=cfg.radius;
+      LENS.distanceScale=cfg.scale;
+      LENS.detailLevel=cfg.detail;
+      LENS.updateHUD();
+      buildRings();   /* rebuild rings with new scale */
+      renderAll();    /* re-render nodes with new scale */
+    }
+    /* always update speed readout */
+    var el=document.getElementById('hspd');
+    if(el)el.textContent=avg.toFixed(1)+' m/s · auto';
+  },
+
+  updateHUD:function(){
+    var cfg=LENS.CONFIGS[LENS.mode];
+    var modeColors={walk:var_green,ride:var_amber,drive:var_purple};
+    var modeLabels={walk:'walking',ride:'riding',drive:'driving'};
+    var hdot=document.getElementById('hdot');
+    var hname=document.getElementById('hname');
+    var lbr=document.getElementById('lb-radius');
+    var lbm=document.getElementById('lb-mode');
+    if(hdot)hdot.style.background=modeColors[LENS.mode];
+    if(hname){hname.style.color=modeColors[LENS.mode];hname.textContent=modeLabels[LENS.mode];}
+    if(lbr)lbr.textContent=cfg.distM>=1000?(cfg.distM/1000).toFixed(1)+'km':cfg.distM+'m';
+    if(lbm)lbm.textContent=cfg.label;
+  },
+
+  /* ─── ENGINE — role controls node prioritization ─── */
+  userRole:'seeking',   /* 'seeking' | 'providing' | 'both' */
+
+  /* role → ring color config */
+  ROLE_COLORS:{
+    seeking:  {ring:'rgba(0,229,160,',   ping:'#00e5a0', label:'Seeking',  hud:'#00e5a0'},
+    providing:{ring:'rgba(255,107,53,',  ping:'#ff6b35', label:'Providing',hud:'#ff6b35'},
+    both:     {ring:'rgba(167,139,250,', ping:'#a78bfa', label:'Both',     hud:'#a78bfa'},
+  },
+
+  setRole:function(role){
+    LENS.userRole=role;
+    /* update pill */
+    ['seeking','both','providing'].forEach(function(r){
+      var btn=document.getElementById('rp-'+r);
+      if(!btn)return;
+      btn.className='rp-'+r+(r===role?' active':'');
+    });
+    /* rebuild rings with new role color */
+    buildRings();
+    /* re-weight all nodes */
+    renderAll();
+    /* update yping color */
+    var rc=LENS.ROLE_COLORS[role];
+    var yp=document.querySelector('.yping');
+    if(yp)yp.style.borderColor=rc.ping;
+    var yc=document.querySelector('.ycore');
+    if(yc)yc.style.background=rc.ping;
+  },
+
+  /* Returns visual weight 0.0–1.0 for a given item given current role */
+  visualWeight:function(item){
+    var vt=vtype(item.vt||'fixed');
+    var isProvider=vt.isTransport||(item.vt==='hawk')||(item.av==='ME');
+    /* corridor score — always computed, applied at end */
+    var corridor=isPathMatching(item);
+    var corridorScore=corridor.score;
+    /* wishlist match = item is in NEEDED segment of portfolio */
+    var neededLabels=portfolioNeededLabels();
+    var wlMatch=neededLabels.some(function(w){
+      return w.on&&item.label.toLowerCase().includes(w.l.toLowerCase().split(' ')[0]);
+    });
+    /* NEEDED + path match = absolute priority, corridor score still applied for non-matches */
+    if(wlMatch && corridor.match) return 1.0;
+    if(wlMatch && !corridor.match) return Math.max(0.45, corridorScore);
+    /* role-based weight, then multiply by corridor score */
+    var roleWeight;
+    if(LENS.userRole==='both'){
+      roleWeight=1.0;
+    } else if(LENS.userRole==='seeking'){
+      roleWeight=isProvider?1.0:0.35;
+    } else if(LENS.userRole==='providing'){
+      roleWeight=isProvider?0.45:0.85;
+    } else {
+      roleWeight=1.0;
+    }
+    /* multiply role weight by corridor score, floor at 0.1 so nothing fully vanishes */
+    return Math.max(0.1, roleWeight * corridorScore);
+  },
+
+  /* Returns whether node label should show (detail level gate) */
+  showDetail:function(dist){
+    if(LENS.detailLevel==='high')return true;
+    if(LENS.detailLevel==='medium')return dist<300;
+    return dist<150; /* low detail (driving) only show very close items */
+  }
+};
+
+/* color constants (CSS vars not accessible in JS directly) */
+var var_green='#00e5a0';
+var var_amber='#f59e0b';
+var var_purple='#a78bfa';
+
+/* ═══════════════ DIRECTIONAL CORRIDOR MATCHING ═══════════════ */
+
+/*
+  userBearing: the direction the current user is moving, in degrees (0–359).
+  In a real device this comes from GPS heading. Here we simulate it and expose
+  a control so the UI can demonstrate corridor matching live.
+*/
+var userBearing=45; /* default: heading NE (toward Yaba in our demo) */
+
+/*
+  bearingDelta(a, b)
+  Returns the shortest angular distance between two bearings (0–180).
+  e.g. bearingDelta(350, 10) = 20, not 340.
+*/
+function bearingDelta(a, b){
+  if(a===null||a===undefined||b===null||b===undefined)return 180;
+  var d=Math.abs((a - b + 360) % 360);
+  return d > 180 ? 360 - d : d;
 }
 
-function switchRadarTab(n) {
-  currentRadarTab = n;
-  document.getElementById('radar-seg-radar').classList.toggle('on', n===0);
-  document.getElementById('radar-seg-social').classList.toggle('on', n===1);
-  document.getElementById('radar-map').style.display = n===0 ? 'block' : 'none';
-  document.getElementById('radar-social').style.display = n===1 ? 'block' : 'none';
-  if (n===0) { drawBg(); renderAll(); }
+/*
+  getItemBearing(item)
+  Resolves the best available bearing for an item:
+  1. item.route.bearing  — explicitly set by seller/driver
+  2. item.vAngle         — movement direction (mobile items only)
+  3. null                — fixed items with no direction (e.g. stalls)
+*/
+function getItemBearing(item){
+  if(item.route && item.route.bearing !== null && item.route.bearing !== undefined)
+    return item.route.bearing;
+  var vt=vtype(item.vt||'fixed');
+  if(vt.isMoving && !item.parked && item.vAngle !== undefined)
+    return item.vAngle;
+  return null;
 }
 
-function switchMeTab(n) {
-  currentMeTab = n;
-  document.getElementById('me-seg-activity').classList.toggle('on', n===0);
-  document.getElementById('me-seg-profile').classList.toggle('on', n===1);
-  document.getElementById('me-activity').style.display = n===0 ? 'block' : 'none';
-  document.getElementById('me-profile').style.display = n===1 ? 'block' : 'none';
+/*
+  isPathMatching(item)
+  Returns a corridor score object:
+  {
+    match:    bool   — true if directionally compatible
+    score:    0–1    — 1 = perfect same direction, 0 = opposite
+    label:    string — 'same way' | 'cross path' | 'opposite' | 'fixed'
+    delta:    number — angular difference in degrees
+  }
+
+  Rules:
+  - Fixed items (no bearing): always "fixed", score 0.7 (neutral, always visible)
+  - delta ≤ 45°:  same corridor  → score 1.0  (full priority)
+  - delta ≤ 90°:  cross path     → score 0.65 (moderate visibility)
+  - delta ≤ 135°: diverging      → score 0.35 (dimmed)
+  - delta > 135°: opposite/away  → score 0.15 (heavily dimmed)
+*/
+function isPathMatching(item){
+  var bearing=getItemBearing(item);
+  if(bearing===null){
+    return {match:true, score:0.7, label:'fixed', delta:0};
+  }
+  var delta=bearingDelta(userBearing, bearing);
+  if(delta<=45)  return {match:true,  score:1.0,  label:'same way',  delta:delta};
+  if(delta<=90)  return {match:true,  score:0.65, label:'cross path', delta:delta};
+  if(delta<=135) return {match:false, score:0.35, label:'diverging',  delta:delta};
+               return {match:false, score:0.15, label:'opposite',   delta:delta};
 }
 
-// Tab switching (now only 3 tabs)
-const TABS = {assets:'s-assets', radar:'s-radar', me:'s-me'};
+/*
+  needsHighlight(item)
+  True if the item is in the user's NEEDED portfolio AND is path-matching.
+  These nodes get the corridor-match visual treatment (pulsing border, max opacity).
+*/
+function needsHighlight(item){
+  var needed=portfolioNeededLabels();
+  var inNeeded=needed.some(function(n){
+    return item.label.toLowerCase().includes(n.l.toLowerCase().split(' ')[0]);
+  });
+  if(!inNeeded)return false;
+  var corridor=isPathMatching(item);
+  return corridor.match;
+}
+
+/* ═══════════════ STAR DEFINITIONS ═══════════════ */
+var itemStars=[
+  {e:'⚡',m:'Fast',sel:false},
+  {e:'🔧',m:'Quality',sel:false},
+  {e:'💰',m:'Value',sel:false},
+  {e:'💬',m:'Comms',sel:false},
+  {e:'❤️',m:'Love it',sel:false},
+];
+var sellerStars=[
+  {e:'⚡',m:'Responsive',sel:false},
+  {e:'🔧',m:'Reliable',sel:false},
+  {e:'💰',m:'Fair price',sel:false},
+  {e:'💬',m:'Friendly',sel:false},
+  {e:'❤️',m:'Recommend',sel:false},
+];
+
+function starSVG(sel){
+  var c=sel?'var(--text)':'none';
+  var s=sel?'var(--text)':'var(--muted)';
+  return '<svg width="34" height="34" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"><path d="M18 4L22 13.5L33 14.6L25 22.3L27.3 33.2L18 28L8.7 33.2L11 22.3L3 14.6L14 13.5Z" fill="'+c+'" stroke="'+s+'" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+}
+
+function buildStars(stars){
+  var row=document.getElementById('star-row');
+  row.innerHTML='';
+  stars.forEach(function(s,i){
+    var el=document.createElement('div');
+    el.className='sitem'+(s.sel?' sel':'');
+    el.innerHTML=starSVG(s.sel)+'<span class="semoji">'+s.e+'</span><span class="smng">'+s.m+'</span>';
+    el.onclick=(function(idx){return function(){tapStar(idx);};})(i);
+    row.appendChild(el);
+  });
+}
+
+function tapStar(idx){
+  var stars=revTab==='item'?itemStars:sellerStars;
+  stars[idx].sel=!stars[idx].sel;
+  buildStars(stars);
+  updateAutoComment(stars);
+  if(revTimer)clearTimeout(revTimer);
+  revTimer=setTimeout(function(){reorderStars(stars);},3000);
+}
+
+function reorderStars(stars){
+  var sel=stars.filter(function(s){return s.sel;});
+  var unsel=stars.filter(function(s){return !s.sel;});
+  var reord=sel.concat(unsel);
+  for(var i=0;i<stars.length;i++){stars[i].e=reord[i].e;stars[i].m=reord[i].m;stars[i].sel=reord[i].sel;}
+  buildStars(stars);
+}
+
+function genComment(stars,tab){
+  var sel=stars.filter(function(s){return s.sel;}).map(function(s){return s.m;});
+  var unsel=stars.filter(function(s){return !s.sel;}).map(function(s){return s.m;});
+  if(!sel.length)return 'Tap stars to build your review…';
+  var subj=tab==='item'?'The item':'The seller';
+  if(sel.length===5)return subj+' was exceptional — fast, quality, great value, excellent communication, and highly recommended!';
+  if(sel.length===1)return subj+' stood out for '+sel[0].toLowerCase()+'. Room to improve in other areas.';
+  var pos=sel.slice(0,-1).join(', ')+' and '+sel[sel.length-1];
+  var neg=unsel.length?'Could improve on '+unsel.join(' & ')+'.':'';
+  return subj+' scored well on '+pos.toLowerCase()+'. '+neg;
+}
+
+function updateAutoComment(stars){
+  var el=document.getElementById('autocomment');
+  var btn=document.getElementById('subbtn');
+  var txt=genComment(stars,revTab);
+  el.textContent=txt;
+  var hasSel=stars.some(function(s){return s.sel;});
+  el.className='autocomment'+(hasSel?' live':'');
+  btn.className='subbtn'+(hasSel?' show':'');
+}
+
+function switchRTab(tab){
+  revTab=tab;
+  document.getElementById('rt-item').className='rtab'+(tab==='item'?' on':'');
+  document.getElementById('rt-seller').className='rtab'+(tab==='seller'?' on':'');
+  document.getElementById('rev-title').textContent=tab==='item'?'How was the item?':'How was the seller?';
+  var stars=tab==='item'?itemStars:sellerStars;
+  buildStars(stars);
+  updateAutoComment(stars);
+}
+
+function submitReview(){
+  var stars=revTab==='item'?itemStars:sellerStars;
+  var cnt=stars.filter(function(s){return s.sel;}).length;
+  var btn=document.getElementById('subbtn');
+  btn.textContent='✓ Submitted — '+cnt+'/5 stars';
+  btn.style.cssText='background:var(--surf2);color:var(--green);border:1px solid rgba(0,229,160,.3)';
+  btn.disabled=true;
+  stars.forEach(function(s){s.sel=false;});
+  setTimeout(function(){buildStars(stars);updateAutoComment(stars);btn.textContent='Submit review ↑';btn.style.cssText='';btn.disabled=false;},2500);
+}
+
+/* ═══════════════ PANELS ═══════════════ */
+var P={
+  open:function(id){var el=document.getElementById(id);if(el)el.classList.add('on');},
+  close:function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');}
+};
+
+/* ═══════════════ NAVIGATION ═══════════════ */
+var TABS={radar:'s-radar',portfolio:'s-portfolio',activity:'s-activity',profile:'s-profile'};
 function showTab(name){
-  Object.keys(TABS).forEach(k => {
-    document.getElementById(TABS[k]).classList.remove('active');
-    document.getElementById('tab-'+k).classList.remove('on');
+  Object.keys(TABS).forEach(function(k){
+    var s=document.getElementById(TABS[k]);if(s)s.classList.remove('active');
+    var b=document.getElementById('tab-'+k);if(b)b.classList.remove('on');
   });
-  document.getElementById(TABS[name]).classList.add('active');
-  document.getElementById('tab-'+name).classList.add('on');
-
-  if(name==='radar'){
-    drawBg(); renderAll();
-    updateNeededStatusCircles(); // WhatsApp-style circles when Needed items exist
-  }
-  if(name==='assets') PORT.render();
-  if(name==='me'){
-    ACT.render();
-    PROF.refresh();
-  }
+  var target=document.getElementById(TABS[name]);if(target)target.classList.add('active');
+  var btn=document.getElementById('tab-'+name);if(btn)btn.classList.add('on');
+  if(name==='radar'){drawBg();renderAll();}
+  if(name==='portfolio'){PORT.render();}
+  if(name==='profile'){PROF.refresh();}
+  if(name==='activity'){ACT.render();}
 }
 
-// Mock Store - Digital Product Twins
-function buildStoreGrid(){
-  const grid = document.getElementById('store-grid');
-  grid.innerHTML = '';
-  const twins = [
-    {icon:'🥭', name:'Mango Season Twin', creator:'@LagosFruits', price:'Free'},
-    {icon:'👗', name:'Ankara Pattern Pack', creator:'@FabricLabNG', price:'₦1,200'},
-    {icon:'🛵', name:'Okada Route Optimizer', creator:'@NaijaRoutes', price:'Free'},
-    {icon:'🌶️', name:'Pepper Soup Recipe Twin', creator:'@MamaEfo', price:'₦450'},
-  ];
-  twins.forEach(t => {
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surf2);border:1px solid var(--bdr);border-radius:12px;padding:12px;text-align:center;cursor:pointer';
-    card.innerHTML = `
-      <div style="font-size:42px;margin-bottom:8px">${t.icon}</div>
-      <div style="font-weight:600;font-size:13px">${t.name}</div>
-      <div style="font-size:11px;color:var(--muted)">by ${t.creator}</div>
-      <button onclick="acquireDigitalTwin('${t.name}')" class="bigbtn btn-green" style="margin-top:10px;font-size:12px;padding:8px">Get Twin</button>
-    `;
-    grid.appendChild(card);
+/* ═══════════════ RADAR ENGINE ═══════════════ */
+function drawBg(){
+  var c=document.getElementById('mc');if(!c)return;
+  var ctx=c.getContext('2d');
+  c.width=W();c.height=H()-56;
+  ctx.fillStyle='#0a0f1a';ctx.fillRect(0,0,W(),H());
+  ctx.strokeStyle='rgba(30,45,69,0.45)';ctx.lineWidth=1;
+  for(var i=-20;i<30;i++){ctx.beginPath();ctx.moveTo(i*40,0);ctx.lineTo(i*40+(H()-56)*0.5,H()-56);ctx.stroke();}
+  for(var j=0;j<20;j++){ctx.beginPath();ctx.moveTo(0,j*55);ctx.lineTo(W(),j*55);ctx.stroke();}
+}
+
+function buildRings(){
+  var r=document.getElementById('rings');if(!r)return;r.innerHTML='';
+  var rc=LENS.ROLE_COLORS[LENS.userRole];
+  var baseR=LENS.radarRadius;
+  /* 3 rings scaled proportionally from current lens radius */
+  var sizes=[Math.round(baseR*0.5),baseR,Math.round(baseR*1.45)];
+  sizes.forEach(function(s,i){
+    var el=document.createElement('div');
+    var op=0.28-i*0.07;
+    el.style.cssText='position:absolute;border-radius:50%;border:1px solid '+rc.ring+op+');top:50%;left:50%;transform:translate(-50%,-50%);width:'+s+'px;height:'+s+'px;animation:pulse-r 2s ease-out infinite '+(i*0.5)+'s;transition:width .6s ease,height .6s ease,border-color .4s ease';
+    r.appendChild(el);
   });
 }
 
-function acquireDigitalTwin(name){
-  // Clone into Needed list
-  portfolio.push({
-    id:'dp'+Date.now(),
-    icon:'🔗',
-    label:name + ' (Digital Twin)',
-    price:'—',
-    color:'#a78bfa',
-    status:'needed',
+function seatBg(item){
+  if(!item.seats||item.seats===0)return '#f87171';
+  if(item.seats/item.totalSeats>0.5)return '#00e5a0';
+  return '#f59e0b';
+}
+
+function nodeTypeClass(item){
+  var vt=item.vt||'fixed';
+  if(vt==='fixed')return 'tf';
+  if(vt==='hawk')return 'th';
+  if(vt==='keke')return 'tk';
+  if(vt==='okada'||vt==='motorcycle')return 'to';
+  if(vt==='truck'||vt==='van')return 'tv';
+  if(vt==='car')return 'tp';
+  return 'tf';
+}
+
+function renderNode(item){
+  var layer=document.getElementById('nodes');if(!layer)return;
+  var el=document.getElementById('nd-'+item.id);
+  if(!el){el=document.createElement('div');el.className='rnode';el.id='nd-'+item.id;layer.appendChild(el);}
+  var cx=CX(),cy=CY();
+  var rad=item.angle*(Math.PI/180);
+  var scale=LENS.distanceScale;
+  var px=cx+Math.cos(rad)*item.dist*scale;
+  var py=cy+Math.sin(rad)*item.dist*scale;
+  el.style.left=px+'px';el.style.top=py+'px';
+  var vt=vtype(item.vt||'fixed');
+  var isT=vt.isTransport;
+  var isF=!vt.isMoving;
+  var isPk=item.parked;
+  var isFull=isT&&item.seats===0;
+
+  /* LENS: visual weight (role x corridor score) */
+  var weight=LENS.visualWeight(item);
+  var pixelRadius=LENS.radarRadius*1.45;
+  var itemPx=Math.sqrt((px-cx)*(px-cx)+(py-cy)*(py-cy));
+  var inRange=itemPx<=pixelRadius;
+  var finalOpacity=isFull?0.2:(inRange?weight:weight*0.3);
+  el.style.opacity=finalOpacity;
+
+  /* CORRIDOR */
+  var corridor=isPathMatching(item);
+  var isHighlight=needsHighlight(item);
+  var showLbl=LENS.showDetail(item.dist);
+  var bgStyle=isF?item.color+'18':isPk?item.color+'1a':item.color+'28';
+  var shape=isF?'9px':isPk?'9px':'50%';
+  var anim=(!isF&&!isPk)?'animation:floatn 2.5s ease-in-out infinite':'';
+
+  /* border encodes corridor match */
+  var bdrStyle;
+  if(isHighlight)                         bdrStyle='3px solid '+item.color;
+  else if(corridor.label==='same way')    bdrStyle='2px solid '+item.color;
+  else if(corridor.label==='cross path')  bdrStyle='2px solid '+item.color+'99';
+  else if(corridor.label==='diverging')   bdrStyle='1.5px dashed '+item.color+'66';
+  else if(corridor.label==='opposite')    bdrStyle='1px dashed '+item.color+'33';
+  else                                    bdrStyle=isF?'2px dashed '+item.color+'55':'2px solid '+item.color;
+
+  /* highlight node gets pulsing ring via CSS class */
+  el.classList.toggle('corridor-match', isHighlight);
+
+  /* node size scales with corridor priority */
+  var baseSize=LENS.detailLevel==='low'?32:LENS.detailLevel==='medium'?36:40;
+  var nodeSize=isHighlight?baseSize+6:corridor.label==='same way'?baseSize+2:baseSize;
+  var fontSize=LENS.detailLevel==='low'?14:LENS.detailLevel==='medium'?15:17;
+
+  /* direction arrow badge for moving items */
+  var bearingVal=getItemBearing(item);
+  var dirArrow='';
+  if(bearingVal!==null&&!isF&&!isPk&&showLbl){
+    var arrowIdx=Math.round(((bearingVal%360)+360)%360/45)%8;
+    var arrows=['\u2191','\u2197','\u2192','\u2198','\u2193','\u2199','\u2190','\u2196'];
+    dirArrow='<div style="position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:9px;color:'+item.color+';font-weight:700;line-height:1">'+arrows[arrowIdx]+'</div>';
+  }
+
+  var sb='';
+  if(isT&&item.totalSeats){
+    var bgc=seatBg(item);
+    sb='<div class="sbadge" id="sb-'+item.id+'" style="background:'+bgc+';color:'+(item.seats===0?'#fff':'#000')+'">'+(isFull?'X':item.seats)+'</div>';
+  }
+  var pb=isPk?'<div class="pbadge">PARKED</div>':'';
+  var corrTag=(!isF&&corridor.label!=='fixed')?' \u00b7 '+corridor.label:'';
+
+  el.innerHTML='<div class="nbub" style="width:'+nodeSize+'px;height:'+nodeSize+'px;background:'+bgStyle+';border-radius:'+shape+';border:'+bdrStyle+';'+anim+'">'
+    +'<span style="font-size:'+fontSize+'px">'+item.icon+'</span>'+sb+pb+dirArrow+'</div>'
+    +(showLbl?'<div class="nlbl" style="color:'+item.color+'">'+item.label+((!isF&&!isPk)?' \u00b7 moving':isPk?' \u00b7 parked':'')+' \u00b7 '+Math.round(item.dist)+'m'+(isT&&item.totalSeats?' \u00b7 '+item.seats+'s':'')+corrTag+'</div>':'');
+  if(!isFull){el.onclick=(function(it){return function(){openItem(it);};})(item);el.style.cursor='pointer';}
+  else{el.onclick=null;el.style.cursor='not-allowed';}
+}
+
+/* ═══════════════ BEACON RENDERING ═══════════════ */
+
+/*
+  getActiveBeacons()
+  Returns portfolio NEEDED items that have isBeaconActive === true.
+  These are broadcast as demand signals on the map.
+*/
+function getActiveBeacons(){
+  return portfolio.filter(function(p){
+    return p.status==='needed' && p.isBeaconActive;
+  });
+}
+
+/*
+  renderBeacons()
+  Draws demand beacons onto the radar. Two visual states:
+
+  MASKED (Provider is viewing — LENS.userRole === 'providing'):
+    - Soft pulsing glow zone, category icon only, no pinpoint, no identity
+    - Position is deliberately jittered ±30px from true location
+    - Ripple rings emanate outward
+
+  REVEALED (Provider's route matches beacon's destination bearing):
+    - Glow sharpens into a full interactable node
+    - "MATCH" badge appears
+    - User can tap to open chat
+
+  SEEKER VIEW (role === 'seeking' or 'both'):
+    - Shows own beacons as normal nodes with a pulsing ring to confirm broadcast
+*/
+function renderBeacons(){
+  /* clean up old beacon elements */
+  var old=document.querySelectorAll('.beacon-zone,.beacon-node');
+  old.forEach(function(el){if(el.parentNode)el.parentNode.removeChild(el);});
+
+  var beacons=getActiveBeacons();
+  if(!beacons.length)return;
+
+  var cx=CX(), cy=CY();
+  var isProviderView=(LENS.userRole==='providing');
+  var scale=LENS.distanceScale;
+
+  beacons.forEach(function(beacon,bi){
+    /* derive a stable pseudo-position for this beacon on the radar
+       In real app this would be the seeker's actual GPS coords.
+       Here we place it at a plausible angle/dist derived from beacon index */
+    var baseAngle=(60+bi*110)%360;
+    var baseDist=80+bi*55;
+    var rad=baseAngle*(Math.PI/180);
+    var truePx=cx+Math.cos(rad)*baseDist*scale;
+    var truePy=cy+Math.sin(rad)*baseDist*scale;
+
+    /* corridor match check — does this beacon's destination align with provider heading? */
+    var beaconBearing=beacon.route&&beacon.route.bearing!==null?beacon.route.bearing:null;
+    var corridor=beaconBearing!==null?isPathMatching({route:beacon.route,vt:'hawk',parked:false,vAngle:beaconBearing}):{match:false,score:0.5,label:'unknown',delta:180};
+    var isRevealed=corridor.match; /* provider can see exact location */
+
+    if(isProviderView){
+      if(isRevealed){
+        /* ── REVEALED: full interactable node ── */
+        var node=document.createElement('div');
+        node.className='beacon-node';
+        node.style.cssText='position:absolute;left:'+truePx+'px;top:'+truePy+'px;z-index:9;cursor:pointer;';
+        var nodeSize=44;
+        node.innerHTML=(
+          '<div class="nbub" style="width:'+nodeSize+'px;height:'+nodeSize+'px;'
+          +'background:rgba(0,229,160,0.18);border-radius:50%;border:2.5px solid #00e5a0;'
+          +'animation:floatn 2s ease-in-out infinite">'
+          +'<span style="font-size:19px">'+beacon.icon+'</span>'
+          +'<div class="beacon-badge">MATCH</div>'
+          +'</div>'
+          +'<div class="beacon-label">'
+          +beacon.label+' wanted'
+          +(corridor.delta!==undefined?' \u00b7 '+corridor.delta.toFixed(0)+'\u00b0':'')
+          +'</div>'
+        );
+        node.onclick=(function(b){return function(){openBeaconChat(b);};})(beacon);
+        document.getElementById('s-radar').appendChild(node);
+      } else {
+        /* ── MASKED: glow zone only ── */
+        /* jitter position slightly — not an exact pinpoint */
+        var jitter=20;
+        var jx=truePx+(Math.random()-0.5)*jitter*2;
+        var jy=truePy+(Math.random()-0.5)*jitter*2;
+        var zone=document.createElement('div');
+        zone.className='beacon-zone';
+        zone.style.cssText='position:absolute;left:'+jx+'px;top:'+jy+'px;';
+        var glowSize=60+corridor.score*30; /* bigger glow = closer match */
+        zone.innerHTML=(
+          '<div class="beacon-glow-ring" style="width:'+glowSize+'px;height:'+glowSize+'px"></div>'
+          +'<div class="beacon-ripple" style="animation-delay:0.8s"></div>'
+          +'<div class="beacon-icon" style="opacity:'+(0.5+corridor.score*0.4)+'">'+beacon.icon+'</div>'
+        );
+        document.getElementById('s-radar').appendChild(zone);
+      }
+    } else {
+      /* ── SEEKER VIEW: own beacon shown with pulsing confirmation ring ── */
+      var snode=document.createElement('div');
+      snode.className='beacon-node';
+      snode.style.cssText='position:absolute;left:'+truePx+'px;top:'+truePy+'px;z-index:9;pointer-events:none;';
+      snode.innerHTML=(
+        '<div style="position:absolute;top:50%;left:50%;border-radius:50%;border:2px solid #00e5a0;'
+        +'animation:beacon-ripple 1.8s ease-out infinite;transform:translate(-50%,-50%)"></div>'
+        +'<div class="nbub" style="width:40px;height:40px;background:rgba(0,229,160,0.12);'
+        +'border-radius:50%;border:2px solid #00e5a0;animation:floatn 2s ease-in-out infinite">'
+        +'<span style="font-size:17px">'+beacon.icon+'</span>'
+        +'</div>'
+        +'<div class="beacon-label">\U0001f4e1 broadcasting</div>'
+      );
+      document.getElementById('s-radar').appendChild(snode);
+    }
+  });
+}
+
+/*
+  openBeaconChat(beacon)
+  When a Provider taps a REVEALED beacon node, open a pre-filled
+  chat sheet. No identity is shown until the Seeker accepts.
+*/
+function openBeaconChat(beacon){
+  /* re-use the item detail panel with a beacon-specific layout */
+  activeItem={
+    id:'beacon-'+beacon.id,
+    icon:beacon.icon,
+    label:beacon.label+' (demand beacon)',
+    price:beacon.price,
+    color:'#00e5a0',
     vt:'fixed',
-    isBeaconActive:true
+    dist:80,
+    parked:false,
+    av:'??',
+    seller:'Anonymous seeker',
+    route:beacon.route,
+    msgs:[
+      {m:false,t:'Someone nearby is looking for: '+beacon.label},
+      {m:false,t:'Route match detected. Tap to connect.'}
+    ]
+  };
+  document.getElementById('ii-ico').textContent=beacon.icon;
+  document.getElementById('ii-title').textContent=beacon.label+' \u2014 demand beacon';
+  document.getElementById('ii-sub').textContent='Nearby seeker \u00b7 route match \u00b7 tap to connect';
+  document.getElementById('ii-tags').innerHTML='<span class="tag" style="background:rgba(0,229,160,.12);border-color:rgba(0,229,160,.35);color:var(--green)">\U0001f4e1 beacon</span><span class="tag" style="background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);color:#6ee7b7">route match</span>';
+  document.getElementById('ii-seats').innerHTML='';
+  document.getElementById('ii-park').innerHTML='';
+  document.getElementById('c-av').textContent='?';
+  document.getElementById('c-name').textContent='Anonymous seeker';
+  var msgs=document.getElementById('msgs');msgs.innerHTML='';
+  activeItem.msgs.forEach(function(m){
+    var el=document.createElement('div');el.className='msg '+(m.m?'me':'them');
+    el.innerHTML=m.t+'<div class="mtime">'+(m.m?'You':'System')+'</div>';
+    msgs.appendChild(el);
   });
-  showNotif('🔗', name + ' acquired', 'Added to Needed • Beacon active', '#00e5a0');
-  PORT.render();
-  updateNeededStatusCircles();
-  switchAssetsTab(0); // switch back to My Assets
+  document.getElementById('act-btns').innerHTML='<button class="bigbtn btn-green" style="margin-top:11px" onclick="revealAndChat()">&#x2714; Connect &amp; reveal location</button>';
+  P.open('p-item');
 }
 
-// WhatsApp-style Needed status circles (only visible when Needed items exist)
-function updateNeededStatusCircles(){
-  const container = document.getElementById('needed-status-circles');
-  container.innerHTML = '';
-  const needed = portfolio.filter(p => p.status === 'needed');
-  if(needed.length === 0) return;
-  
-  needed.slice(0,5).forEach(item => {
-    const circle = document.createElement('div');
-    circle.style.cssText = `width:38px;height:38px;border-radius:50%;background:var(--surf);border:2.5px solid ${item.color||'#00e5a0'};display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 0 3px rgba(0,229,160,0.15);`;
-    circle.textContent = item.icon;
-    container.appendChild(circle);
-  });
+function revealAndChat(){
+  var msgs=document.getElementById('msgs');
+  var el=document.createElement('div');el.className='msg them';
+  el.innerHTML='Location shared. Coming your way! \U0001f44d<div class="mtime">Seeker \u00b7 now</div>';
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+  document.getElementById('act-btns').innerHTML='<button class="bigbtn btn-green" style="margin-top:11px" onclick="P.close(\'p-item\')">&#x21d7; Navigate to seeker</button>';
 }
 
-// Initialize everything (existing init logic preserved)
-window.addEventListener('resize',()=>{drawBg();renderAll();});
+function renderAll(){var l=document.getElementById('nodes');if(l)l.innerHTML='';allItems.forEach(renderNode);renderBeacons();}
 
-// Existing init calls (drawBg, buildRings, renderAll, PORT.render, etc.)
-allItems = portfolioToRadar();
-drawBg();
-buildRings();
-renderAll();
-PORT.render();
-ACT.render();
-PROF.refresh();
+function moveItem(item){
+  var vt=vtype(item.vt||'fixed');
+  if(item.parked||!vt.isMoving)return;
+  var vr=item.vAngle*(Math.PI/180);
+  var nx=Math.cos(item.angle*(Math.PI/180))*item.dist+Math.cos(vr)*item.speed;
+  var ny=Math.sin(item.angle*(Math.PI/180))*item.dist+Math.sin(vr)*item.speed;
+  var nd=Math.sqrt(nx*nx+ny*ny);
+  var na=Math.atan2(ny,nx)*(180/Math.PI);
+  var prev=item.dist;
+  item.dist=nd;item.angle=na;
+  /* boundary based on current lens radius in metres */
+  var cfg=LENS.CONFIGS[LENS.mode];
+  var boundaryM=cfg.distM;
+  if(nd>boundaryM*1.3||nd<16)item.vAngle=(item.vAngle+165)%360;
+  if(nd<=boundaryM&&prev>boundaryM)onEntry(item);
+  /* keep route.bearing in sync with vAngle for items without a fixed destination bearing */
+  if(item.route&&(item.route.bearing===null||item.route.bearing===undefined)){
+    item.route.bearing=Math.round(item.vAngle);
+  }
+  var el=document.getElementById('nd-'+item.id);
+  if(el){
+    var cx=CX(),cy=CY();
+    var scale=LENS.distanceScale;
+    var px=cx+Math.cos(na*(Math.PI/180))*nd*scale;
+    var py=cy+Math.sin(na*(Math.PI/180))*nd*scale;
+    el.style.left=px+'px';el.style.top=py+'px';
+    var lbl=el.querySelector('.nlbl');
+    if(lbl&&LENS.showDetail(nd))lbl.textContent=item.label+' \u00b7 moving \u00b7 '+Math.round(nd)+'m'+(vt.isTransport&&item.totalSeats?' \u00b7 '+item.seats+'s':'');
+    if(trailTick%5===0&&LENS.detailLevel!=='low')dropTrail(px,py,item.color);
+  }
+  trailTick++;
+}
+
+function dropTrail(px,py,color){
+  var tl=document.getElementById('trails');if(!tl)return;
+  var t=document.createElement('div');
+  t.className='trail';
+  t.style.cssText='left:'+px+'px;top:'+py+'px;background:'+color+';transform:translate(-50%,-50%)';
+  tl.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2200);
+  if(tl.children.length>80)tl.children[0].parentNode.removeChild(tl.children[0]);
+}
+
+function onEntry(item){
+  var vt=vtype(item.vt||'fixed');
+  document.getElementById('rni').textContent=item.icon;
+  document.getElementById('rnt').textContent=item.label+' entered radar';
+  document.getElementById('rns').textContent=(vt.isTransport&&item.totalSeats?item.seats+' seat'+(item.seats!==1?'s':'')+' · ':'')+ Math.round(item.dist)+'m away';
+  pulseNotif('#ff6b35');
+}
+
+function pulseNotif(color){
+  var el=document.getElementById('rnotif');if(!el)return;
+  el.style.borderColor=color;
+  el.classList.remove('on');void el.offsetWidth;el.classList.add('on');
+  setTimeout(function(){el.classList.remove('on');},3000);
+}
+
+function showNotif(icon,text,sub,color){
+  document.getElementById('rni').textContent=icon;
+  document.getElementById('rnt').textContent=text;
+  document.getElementById('rns').textContent=sub;
+  pulseNotif(color||'#00e5a0');
+}
+
+/* ═══════════════ PARK ═══════════════ */
+function togglePark(item){
+  item.parked=!item.parked;
+  renderNode(item);
+  if(item.parked){
+    showNotif('📍','Coordinates locked','Buyers navigate to fixed spot','#60a5fa');
+    var cx=CX(),cy=CY();
+    var px=cx+Math.cos(item.angle*(Math.PI/180))*item.dist*0.92;
+    var py=cy+Math.sin(item.angle*(Math.PI/180))*item.dist*0.92;
+    var ring=document.createElement('div');
+    ring.style.cssText='position:absolute;left:'+px+'px;top:'+py+'px;width:58px;height:58px;border-radius:50%;border:2px solid #60a5fa;pointer-events:none;z-index:12;animation:lock-pop .6s ease-out forwards';
+    document.getElementById('s-radar').appendChild(ring);
+    setTimeout(function(){if(ring.parentNode)ring.parentNode.removeChild(ring);},700);
+  } else {
+    showNotif('↗','Back on the move','Live GPS restored','#ff6b35');
+  }
+  if(activeItem&&activeItem.id===item.id)openItem(item);
+}
+
+/* ═══════════════ OPEN ITEM ═══════════════ */
+function openItem(item){
+  activeItem=item;
+  document.getElementById('ii-ico').textContent=item.icon;
+  document.getElementById('ii-title').textContent=item.label;
+  var vt=vtype(item.vt||'fixed');
+  var isT=vt.isTransport;
+  var isF=!vt.isMoving;
+  var corr=isPathMatching(item);
+  var corrStr=corr.label!=='fixed'?' · '+corr.label+' ('+corr.delta.toFixed(0)+'°)':'';
+  document.getElementById('ii-sub').textContent=Math.round(item.dist)+'m · '+(item.parked?'parked · fixed spot':isF?'fixed location':'moving · live')+corrStr;
+
+  var tmap={'fixed':'<span class="tag tf">⬛ fixed</span>','hawk':'<span class="tag th">↗ hawking</span>','keke':'<span class="tag tk">🛺 keke</span>','okada':'<span class="tag to">🏍️ okada</span>','truck':'<span class="tag tv">🚛 truck</span>','car':'<span class="tag tp">🚗 car</span>','van':'<span class="tag tv">🚐 van</span>','motorcycle':'<span class="tag to">🏍️ moto</span>','bicycle':'<span class="tag" style="background:rgba(163,230,53,.1);border-color:rgba(163,230,53,.3);color:#bef264">🚲 bicycle</span>','boat':'<span class="tag" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);color:#7dd3fc">⛵ boat</span>'};
+  var tt=tmap[item.vt||'fixed']||'<span class="tag tf">item</span>';
+  var pk=item.parked?'<span class="tag tpark">📍 parked</span>':'';
+  var fl=isT&&item.seats===0?'<span class="tag tfull">✕ full</span>':'';
+  document.getElementById('ii-tags').innerHTML=tt+'<span class="tag tprice">✓ '+item.price+'</span>'+pk+fl;
+
+  var ss=document.getElementById('ii-seats');
+  if(isT&&item.totalSeats){
+    var units='';
+    for(var i=0;i<item.totalSeats;i++)units+='<div class="sunit '+(i>=item.seats?'taken':'open')+'">'+(i>=item.seats?'👤':'💺')+'</div>';
+    ss.innerHTML='<div class="sdisp"><div style="font-size:10px;color:var(--muted);font-family:\'Space Mono\',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Seats</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+units+'</div><div style="font-size:12px;color:var(--muted);margin-top:6px" id="slive"><b style="color:var(--text)">'+item.seats+'</b>/'+item.totalSeats+' open'+(item.route?' · '+item.route:'')+'</div></div>';
+  } else ss.innerHTML='';
+
+  var ps=document.getElementById('ii-park');
+  if(isT){ps.innerHTML='<div class="pkstrip"><div style="font-size:10px;color:#93c5fd;font-family:\'Space Mono\',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">'+(item.parked?'📍 Parked · fixed':'↗ Moving · live')+'</div><div style="font-size:12px;color:var(--muted);line-height:1.5">'+(item.parked?'Fixed spot. Navigate directly.':'Live GPS. Pin updates as driver moves.')+'</div></div>';}
+  else ps.innerHTML='';
+
+  document.getElementById('c-av').textContent=item.av;
+  document.getElementById('c-name').textContent=item.seller;
+  buildChat(item);
+
+  var ab=document.getElementById('ii-acts');
+  if(isT&&item.totalSeats){
+    var isFull=item.seats===0;
+    var nl=item.parked?'↗ Navigate to parked spot':'↗ Track & intercept';
+    ab.innerHTML='<button class="bigbtn btn-amber" id="bkbtn" style="margin-top:11px" onclick="bookSeat()">'+(isFull?'✕ Fully booked':'💺 Book seat · '+item.price)+'</button><button class="bigbtn btn-orange" style="margin-top:7px" onclick="P.close(\'p-item\')">'+nl+'</button>';
+    if(isFull)document.getElementById('bkbtn').style.cssText='background:var(--surf2);color:var(--muted);border:1px solid var(--bdr);cursor:not-allowed;margin-top:11px;width:100%;border-radius:11px;padding:12px;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center';
+  } else {
+    ab.innerHTML='<button class="bigbtn btn-orange" style="margin-top:11px" onclick="P.close(\'p-item\')">'+(item.parked||isF?'↗ Navigate to location':'↗ Track this hawker')+'</button>';
+  }
+
+  itemStars.forEach(function(s){s.sel=false;});
+  sellerStars.forEach(function(s){s.sel=false;});
+  revTab='item';
+  document.getElementById('rt-item').className='rtab on';
+  document.getElementById('rt-seller').className='rtab';
+  document.getElementById('rev-title').textContent='How was the item?';
+  buildStars(itemStars);
+  updateAutoComment(itemStars);
+  P.open('p-item');
+}
+
+function bookSeat(){
+  if(!activeItem||!activeItem.seats||activeItem.seats<=0)return;
+  activeItem.seats--;
+  renderNode(activeItem);
+  var ss=document.getElementById('ii-seats');
+  if(ss.innerHTML){
+    var units='';
+    for(var i=0;i<activeItem.totalSeats;i++)units+='<div class="sunit '+(i>=activeItem.seats?'taken':'open')+'">'+(i>=activeItem.seats?'👤':'💺')+'</div>';
+    var sr=ss.querySelector('[style*="display:flex"]');if(sr)sr.innerHTML=units;
+    var sl=document.getElementById('slive');if(sl)sl.innerHTML='<b style="color:var(--text)">'+activeItem.seats+'</b>/'+activeItem.totalSeats+' open'+(activeItem.route?' · '+activeItem.route:'');
+  }
+  var bb=document.getElementById('bkbtn');
+  if(bb){if(activeItem.seats===0)bb.textContent='✕ Fully booked';else bb.textContent='💺 Book seat · '+activeItem.price;}
+  var msgs=document.getElementById('msgs');
+  var m=document.createElement('div');m.className='msg me';
+  m.innerHTML='Seat booked ✓<div class="mtime">You · now</div>';msgs.appendChild(m);
+  setTimeout(function(){
+    var r=document.createElement('div');r.className='msg them';
+    r.innerHTML=(activeItem.seats===0?'Full now, see you!':'Confirmed! On my way 👍')+'<div class="mtime">'+activeItem.seller+'</div>';
+    msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;
+  },1000);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function buildChat(item){
+  var msgs=document.getElementById('msgs');msgs.innerHTML='';
+  (item.msgs||[]).forEach(function(m){
+    var el=document.createElement('div');el.className='msg '+(m.m?'me':'them');
+    el.innerHTML=m.t+'<div class="mtime">'+(m.m?'You':'Seller')+'</div>';
+    msgs.appendChild(el);
+  });
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function sendMsg(){
+  var inp=document.getElementById('cinp');var text=inp.value.trim();
+  if(!text||!activeItem)return;
+  var msgs=document.getElementById('msgs');
+  var m=document.createElement('div');m.className='msg me';
+  m.innerHTML=text+'<div class="mtime">You</div>';msgs.appendChild(m);inp.value='';
+  if(!activeItem.msgs)activeItem.msgs=[];activeItem.msgs.push({m:true,t:text});
+  msgs.scrollTop=msgs.scrollHeight;
+  var vt=vtype(activeItem.vt||'fixed');
+  var replies=vt.isTransport?['Coming! How many seats?','Which stop?','Almost there!']:['Available now!','How many?','Coming your way!'];
+  setTimeout(function(){
+    var r=document.createElement('div');r.className='msg them';
+    r.innerHTML=replies[Math.floor(Math.random()*replies.length)]+'<div class="mtime">'+activeItem.seller+'</div>';
+    msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;
+  },800+Math.random()*700);
+}
+
+/* ═══════════════ GO LIVE (panel) ═══════════════ */
+var GL={
+  type:'fixed',seats:2,
+  init:function(){
+    var g=document.getElementById('gl-tgrid');if(!g)return;g.innerHTML='';
+    VTYPES.forEach(function(vt){
+      var el=document.createElement('div');
+      el.className='topt'+(GL.type===vt.id?' sel':'');
+      el.id='gl-t-'+vt.id;
+      el.innerHTML='<div class="topt-ico">'+vt.icon+'</div><div class="topt-lbl">'+vt.label+'</div><div class="topt-desc">'+vt.desc+'</div>';
+      el.onclick=(function(vtid){return function(){GL.setType(vtid);};})(vt.id);
+      g.appendChild(el);
+    });
+  },
+  setType:function(t){
+    GL.type=t;
+    VTYPES.forEach(function(vt){var el=document.getElementById('gl-t-'+vt.id);if(el)el.className='topt'+(t===vt.id?' sel':'');});
+    var vt=vtype(t);
+    document.getElementById('gl-goods-f').style.display=vt.isTransport?'none':'block';
+    document.getElementById('gl-route-f').style.display=vt.isTransport?'block':'none';
+    document.getElementById('gl-seats-f').style.display=vt.isTransport?'block':'none';
+    document.getElementById('gl-park-ctrl').style.display=vt.isMoving?'block':'none';
+    if(vt.isTransport){GL.seats=vt.defaultSeats||1;document.getElementById('gl-snum').textContent=GL.seats;document.getElementById('gl-smax').textContent='max '+(vt.maxSeats||1);}
+  },
+  adjSeats:function(d){
+    var max=vtype(GL.type).maxSeats||1;
+    GL.seats=Math.max(1,Math.min(max,GL.seats+d));
+    document.getElementById('gl-snum').textContent=GL.seats;
+  },
+  togglePark:function(){
+    var vt=vtype(GL.type);
+    var isPk=document.getElementById('gl-pkbtn').classList.contains('dounpark');
+    var btn=document.getElementById('gl-pkbtn');
+    var body=document.getElementById('gl-pkbody');
+    if(isPk){btn.className='pkbtn dopark';btn.textContent='📍 Park & lock coordinates';body.textContent='Your item moves with your phone.';}
+    else{btn.className='pkbtn dounpark';btn.textContent='↗ Resume moving';body.textContent='Coordinates locked. Buyers navigate to your fixed spot.';}
+  },
+  post:function(){
+    var vt=vtype(GL.type);
+    var name=vt.isTransport?document.getElementById('gl-route').value.trim():document.getElementById('gl-name').value.trim();
+    if(!name)return;
+    var price=document.getElementById('gl-price').value.trim()||'–';
+    var icons={fixed:'📌',hawk:'🎒',keke:'🛺',okada:'🏍️',truck:'🚛',car:'🚗',van:'🚐',motorcycle:'🏍️',bicycle:'🚲',boat:'⛵'};
+    var newItem={id:'u'+Date.now(),icon:icons[GL.type]||vt.icon,label:name,seller:'You',av:'ME',price:vt.isTransport?price+'/seat':price,color:vt.color,vt:GL.type,angle:Math.random()*360,dist:vt.isTransport?28:45,vAngle:Math.random()*360,speed:vt.id==='okada'||vt.id==='motorcycle'?3.5:vt.id==='keke'?2.6:vt.id==='truck'?1.5:vt.id==='car'?3.2:vt.id==='van'?2:1.0,parked:false,msgs:[{m:false,t:'Hi! '+name+' available now.'}]};
+    if(vt.isTransport){newItem.totalSeats=GL.seats;newItem.seats=GL.seats;newItem.route=name;}
+    if(vt.isMoving)mobiles.push(newItem);else fixeds.push(newItem);
+    allItems=portfolioToRadar();
+    renderAll();
+    P.close('p-golive');
+    showNotif('📍','"'+name+'" is live','Visible on nearby radars','#00e5a0');
+    PORT.render();PROF.refresh();
+  }
+};
+
+/* ═══════════════ DRIVER CONTROLS ═══════════════ */
+var DRV={
+  open:function(item){
+    driverItem=item;
+    DRV.refresh();
+    P.open('p-driver');
+  },
+  refresh:function(){
+    if(!driverItem)return;
+    var di=document.getElementById('drv-info');
+    var vt=vtype(driverItem.vt||'keke');
+    di.innerHTML='<div style="display:flex;align-items:center;gap:9px;margin-bottom:10px"><span style="font-size:22px">'+driverItem.icon+'</span><div><div style="font-size:13px;font-weight:500">'+driverItem.label+'</div><div style="font-size:11px;color:var(--muted)">'+( driverItem.route||driverItem.plate||vt.label)+'</div></div></div><div style="display:flex;gap:6px;flex-wrap:wrap" id="drv-sunits"></div><div style="font-size:12px;color:var(--muted);margin-top:7px" id="drv-smeta"></div>';
+    DRV.renderSeats();
+    var body=document.getElementById('drv-pkbody');
+    var btn=document.getElementById('drv-pkbtn');
+    document.getElementById('drv-snum').textContent=driverItem.seats||0;
+    document.getElementById('drv-shint').textContent='of '+(driverItem.totalSeats||1);
+    if(driverItem.parked){btn.className='pkbtn dounpark';btn.textContent='↗ Resume · unlock location';body.textContent='Coordinates locked. Buyers navigate to your parked spot.';}
+    else{btn.className='pkbtn dopark';btn.textContent='📍 Park & lock coordinates';body.textContent='Moving with your phone. Park before stepping away.';}
+  },
+  renderSeats:function(){
+    if(!driverItem||!driverItem.totalSeats)return;
+    var su=document.getElementById('drv-sunits');if(!su)return;su.innerHTML='';
+    for(var i=0;i<driverItem.totalSeats;i++){
+      var el=document.createElement('div');
+      el.className='sunit '+(i>=driverItem.seats?'taken':'open');
+      el.innerHTML=i>=driverItem.seats?'👤':'💺';
+      el.style.cursor='pointer';
+      el.onclick=(function(idx){return function(){DRV.toggleSeat(idx);};})(i);
+      su.appendChild(el);
+    }
+    var sm=document.getElementById('drv-smeta');
+    if(sm)sm.innerHTML='<b style="color:var(--text)">'+(driverItem.seats||0)+'</b>/'+driverItem.totalSeats+' open';
+  },
+  toggleSeat:function(idx){
+    if(!driverItem)return;
+    if(idx<driverItem.seats)driverItem.seats=Math.max(0,driverItem.seats-1);
+    else driverItem.seats=Math.min(driverItem.totalSeats,driverItem.seats+1);
+    renderNode(driverItem);DRV.renderSeats();
+    document.getElementById('drv-snum').textContent=driverItem.seats;
+  },
+  adjSeats:function(d){
+    if(!driverItem)return;
+    driverItem.seats=Math.max(0,Math.min(driverItem.totalSeats,driverItem.seats+d));
+    renderNode(driverItem);DRV.renderSeats();
+    document.getElementById('drv-snum').textContent=driverItem.seats;
+  },
+  togglePark:function(){
+    if(!driverItem)return;
+    togglePark(driverItem);
+    DRV.refresh();
+  }
+};
+
+/* ═══════════════ PORTFOLIO DATA ═══════════════ */
+var portfolio=[
+  {id:'p1',icon:'🧃',label:'Cold zobo',price:'₦200',color:'#10b981',status:'needed',vt:'hawk',route:{origin:'',destination:'',bearing:null},isBeaconActive:true},
+  {id:'p2',icon:'🚺',label:'Keke to Yaba',price:'₦150/seat',color:'#f59e0b',status:'needed',vt:'keke',route:{origin:'',destination:'Yaba',bearing:45},isBeaconActive:false},
+  {id:'p3',icon:'🥩',label:'My suya stall',price:'₦500',color:'#ff6b35',status:'offering',vt:'fixed',route:{origin:'',destination:'',bearing:null},av:'ME',seller:'You',angle:45,dist:30,vAngle:0,speed:0,parked:false,msgs:[{m:false,t:'Fresh suya ready! 🔥'}]},
+  {id:'p4',icon:'🚺',label:'My keke — Yaba run',price:'₦150/seat',color:'#f59e0b',status:'vault',vt:'keke',totalSeats:3,seats:3,route:{origin:'Surulere',destination:'Yaba',bearing:45},av:'ME',seller:'You',angle:90,dist:25,vAngle:45,speed:2.5,parked:false,msgs:[{m:false,t:'Going Yaba, seats available!'}]},
+  {id:'p5',icon:'👗',label:'Ankara fabric stock',price:'₦2,500',color:'#a78bfa',status:'vault',vt:'fixed',route:{origin:'',destination:'',bearing:null},av:'ME',seller:'You',angle:200,dist:35,vAngle:0,speed:0,parked:false,msgs:[{m:false,t:'Various ankara patterns available'}]},
+];
+
+function portfolioToRadar(){
+  var world=fixeds.concat(mobiles);
+  var myOffering=portfolio.filter(function(p){return p.status==='offering';});
+  return world.concat(myOffering);
+}
+
+function portfolioNeededLabels(){
+  return portfolio.filter(function(p){return p.status==='needed';}).map(function(p){return {l:p.label,c:p.color,on:true,id:p.id};});
+}
+
+/* ═══════════════ PORT MODULE ═══════════════ */
+var PORT={
+  addSeg:'needed',addVType:'fixed',addSeats:2,addVSeats:2,
+  segOpen:{needed:true,offering:true,vault:false},
+  render:function(){
+    PORT.renderSeg('needed');PORT.renderSeg('offering');PORT.renderSeg('vault');
+    PORT.applyVisibilityGuard();PORT.renderChips();
+  },
+  renderSeg:function(seg){
+    var items=portfolio.filter(function(p){return p.status===seg;});
+    var body=document.getElementById('seg-'+seg+'-body');
+    var cnt=document.getElementById('seg-'+seg+'-count');
+    var chev=document.getElementById('chev-'+seg);
+    if(!body)return;
+    if(cnt)cnt.textContent=items.length;
+    if(chev)chev.className='seg-chevron'+(PORT.segOpen[seg]?' open':'');
+    body.className='seg-body'+(PORT.segOpen[seg]?'':' hidden');
+    body.innerHTML='';
+    var sLabel={needed:'Needed',offering:'Offering',vault:'Vault'};
+    var sCls={needed:'sp-n',offering:'sp-o',vault:'sp-v'};
+    var sCycle={needed:'offering',offering:'vault',vault:'needed'};
+    items.forEach(function(item){
+      var realIdx=portfolio.indexOf(item);
+      var el=document.createElement('div');el.className='port-item';
+      var routeStr=item.route&&item.route.destination?'→ '+item.route.destination:'';
+      var seatStr=item.totalSeats?item.seats+'/'+item.totalSeats+' seats':'';
+      var meta=[item.price,routeStr,seatStr].filter(Boolean).join(' · ');
+      var beaconBtn='';if(item.status==='needed'){var bOn=item.isBeaconActive;var bStyle=bOn?'background:rgba(0,229,160,.15);color:var(--green);border-color:rgba(0,229,160,.3)':'background:var(--surf);color:var(--muted);border-color:var(--bdr)';var bTxt=bOn?'📡 live':'📡 off';beaconBtn='<span onclick="PORT.toggleBeacon('+realIdx+')" style="cursor:pointer;border-radius:20px;padding:3px 7px;font-size:10px;font-weight:600;font-family:monospace;border:1px solid;margin-right:2px;'+bStyle+'">'+bTxt+'</span>';}el.innerHTML='<div class="pi-ico">'+item.icon+'</div><div class="pi-info"><div class="pi-name">'+item.label+'</div><div class="pi-meta">'+meta+'</div></div><div class="pi-actions">'+beaconBtn+'<span class="spill '+sCls[item.status]+'" onclick="PORT.cycleStatus('+realIdx+')" title="Tap to change">'+sLabel[item.status]+'</span><button class="pi-del" onclick="PORT.remove('+realIdx+')" title="Remove">✕</button></div>';
+      body.appendChild(el);
+    });
+    var addBtn=document.createElement('button');addBtn.className='port-add';addBtn.innerHTML='＋ Add to '+seg;
+    addBtn.onclick=(function(s){return function(){PORT.openAdd(s);};})(seg);
+    body.appendChild(addBtn);
+  },
+  toggleSeg:function(seg){PORT.segOpen[seg]=!PORT.segOpen[seg];PORT.renderSeg(seg);},
+  cycleStatus:function(idx){
+    var cycle={needed:'offering',offering:'vault',vault:'needed'};
+    var item=portfolio[idx];item.status=cycle[item.status];if(item.status!=='needed')item.isBeaconActive=false;
+    if(item.status==='offering'&&!item.angle){item.angle=Math.random()*360;item.dist=30;item.vAngle=Math.random()*360;var vt2=vtype(item.vt||'fixed');item.speed=vt2.isMoving?1.0:0;item.parked=false;item.av='ME';item.seller='You';if(!item.msgs)item.msgs=[{m:false,t:item.label+' available!'}];}
+    if(item.status!=='offering'){var el2=document.getElementById('nd-'+item.id);if(el2&&el2.parentNode)el2.parentNode.removeChild(el2);}
+    allItems=portfolioToRadar();PORT.render();renderAll();PROF.refresh();
+    var lbs={needed:'Demand signal on radar',offering:'Supply node on radar',vault:'Hidden from radar'};
+    showNotif(item.icon,'"'+item.label+'"',lbs[item.status],item.status==='offering'?'#ff6b35':item.status==='needed'?'#00e5a0':'#8892a4');
+  },
+  remove:function(idx){var item=portfolio[idx];var el=document.getElementById('nd-'+item.id);if(el&&el.parentNode)el.parentNode.removeChild(el);portfolio.splice(idx,1);allItems=portfolioToRadar();PORT.render();renderAll();},toggleBeacon:function(idx){var item=portfolio[idx];if(!item||item.status!=='needed')return;item.isBeaconActive=!item.isBeaconActive;PORT.renderSeg('needed');renderAll();var msg=item.isBeaconActive?'Beacon active — providers see your demand':'Beacon off — passive filter only';showNotif(item.icon,'"'+item.label+'"',msg,item.isBeaconActive?'#00e5a0':'#8892a4');},
+  applyVisibilityGuard:function(){
+    var isPure=LENS.userRole==='seeking';
+    var so=document.getElementById('seg-offering');var sv=document.getElementById('seg-vault');
+    if(so)so.style.display=isPure?'none':'block';if(sv)sv.style.display=isPure?'none':'block';
+  },
+  renderChips:function(){
+    var chips=document.getElementById('chips');if(!chips)return;chips.innerHTML='';
+    portfolioNeededLabels().forEach(function(w){
+      var el=document.createElement('div');el.className='chip on';
+      el.innerHTML='<div class="cdot" style="background:'+w.c+'"></div>'+w.l.split(' ')[0];
+      el.onclick=function(){showTab('portfolio');};chips.appendChild(el);
+    });
+    var a=document.createElement('div');a.className='chip';a.textContent='＋';
+    a.onclick=function(){PORT.openAdd('needed');showTab('portfolio');};chips.appendChild(a);
+  },
+  openAdd:function(seg){
+    PORT.addSeg=seg||'needed';PORT.setAddSeg(PORT.addSeg);
+    PORT.buildVTypeGrid('add-vtype-grid','addVType');PORT.buildVTypeGrid('add-vt-vtype-grid','addVType');P.open('p-additem');
+  },
+  buildVTypeGrid:function(gridId,prop){
+    var g=document.getElementById(gridId);if(!g)return;g.innerHTML='';
+    VTYPES.forEach(function(vt){
+      var el=document.createElement('div');el.className='topt'+(PORT[prop]===vt.id?' sel':'');el.id=gridId+'-'+vt.id;
+      el.innerHTML='<div class="topt-ico">'+vt.icon+'</div><div class="topt-lbl">'+vt.label+'</div><div class="topt-desc">'+vt.desc+'</div>';
+      el.onclick=(function(vtid,pid,gid){return function(){PORT[pid]=vtid;VTYPES.forEach(function(v){var e=document.getElementById(gid+'-'+v.id);if(e)e.className='topt'+(v.id===vtid?' sel':'');});PORT.updateOfferFields(pid==='addVType'&&gid==='add-vtype-grid'?'add-o':'add-v',vtid);};})(vt.id,prop,gridId);
+      g.appendChild(el);
+    });
+  },
+  updateOfferFields:function(prefix,vtid){
+    var vt=vtype(vtid);
+    document.getElementById(prefix+'-goods-f').style.display=vt.isTransport?'none':'block';
+    document.getElementById(prefix+'-route-f').style.display=vt.isTransport?'block':'none';
+    document.getElementById(prefix+'-seats-f').style.display=vt.isTransport?'block':'none';
+    var sn=document.getElementById(prefix+'-snum');var sm=document.getElementById(prefix+'-smax');
+    if(sn){var def=vt.defaultSeats||1;sn.textContent=def;if(prefix==='add-o')PORT.addSeats=def;else PORT.addVSeats=def;}
+    if(sm)sm.textContent='max '+(vt.maxSeats||1);
+  },
+  setAddSeg:function(seg){
+    PORT.addSeg=seg;
+    ['needed','offering','vault'].forEach(function(s){var b=document.getElementById('atab-'+s);if(b)b.className='atab'+(s===seg?(s==='needed'?' an':s==='offering'?' ao':' av'):'');});
+    document.getElementById('add-needed-f').style.display=seg==='needed'?'block':'none';
+    document.getElementById('add-offering-f').style.display=seg==='offering'?'block':'none';
+    document.getElementById('add-vault-f').style.display=seg==='vault'?'block':'none';
+  },
+  adjSeats:function(d){var max=vtype(PORT.addVType).maxSeats||1;PORT.addSeats=Math.max(1,Math.min(max,PORT.addSeats+d));var el=document.getElementById('add-o-snum');if(el)el.textContent=PORT.addSeats;},
+  adjVSeats:function(d){var max=vtype(PORT.addVType).maxSeats||1;PORT.addVSeats=Math.max(1,Math.min(max,PORT.addVSeats+d));var el=document.getElementById('add-v-snum');if(el)el.textContent=PORT.addVSeats;},
+  addItem:function(){
+    var seg=PORT.addSeg;var icons={fixed:'📌',hawk:'👜',keke:'🚺',okada:'🏍️',truck:'🚛',car:'🚗',van:'🚐',motorcycle:'🏍️',bicycle:'🚲',boat:'⛵'};
+    var name,price,dest,vt2;
+    if(seg==='needed'){
+      name=document.getElementById('add-n-name').value.trim();if(!name)return;
+      dest=document.getElementById('add-n-dest').value.trim();
+      portfolio.push({id:'p'+Date.now(),icon:'🔍',label:name,price:'—',color:'#60a5fa',status:'needed',vt:'fixed',route:{origin:'',destination:dest,bearing:null},isBeaconActive:false});
+    } else {
+      var prefix=seg==='offering'?'add-o':'add-v';
+      vt2=vtype(PORT.addVType);
+      name=vt2.isTransport?document.getElementById(prefix+'-route').value.trim():document.getElementById(prefix+'-name').value.trim();
+      if(!name)return;
+      price=document.getElementById(prefix+'-price').value.trim()||'—';
+      var seats=seg==='offering'?PORT.addSeats:PORT.addVSeats;
+      var np={id:'p'+Date.now(),icon:icons[PORT.addVType]||vt2.icon,label:name,price:vt2.isTransport?price+'/seat':price,color:vt2.color,status:seg,vt:PORT.addVType,route:{origin:'',destination:vt2.isTransport?name:'',bearing:seg==='needed'?userBearing:null},av:'ME',seller:'You',angle:Math.random()*360,dist:30,vAngle:Math.random()*360,speed:vt2.isMoving?1.2:0,parked:false,msgs:[{m:false,t:name+' available!'}]};
+      if(vt2.isTransport){np.totalSeats=seats;np.seats=seats;}
+      portfolio.push(np);
+      if(seg==='offering'){allItems=portfolioToRadar();renderAll();}
+    }
+    ['add-n-name','add-n-dest','add-o-name','add-o-route','add-o-price','add-v-name','add-v-route','add-v-price'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    P.close('p-additem');PORT.render();PROF.refresh();
+    showNotif(seg==='needed'?'🔍':icons[PORT.addVType]||'📦','"'+name+'" added',seg+' segment',seg==='offering'?'#ff6b35':'#00e5a0');
+  }
+};
+
+/* ═══════════════ ACTIVITY ═══════════════ */
+var ACT={
+  render:function(){
+    var cl=document.getElementById('act-chats');if(!cl)return;
+    var chats=[
+      {av:'MD',name:'Musa D. (Keke)',msg:'Confirmed! On my way 👍',time:'2m',un:true},
+      {av:'AK',name:'Amaka K. (Zobo)',msg:'Cold zobo! Where you dey?',time:'15m',un:false},
+      {av:'CT',name:'Chukwu T. (Truck)',msg:'Heading Apapa, space for cargo + 1',time:'1h',un:false},
+    ];
+    cl.innerHTML='';
+    chats.forEach(function(c){
+      var el=document.createElement('div');el.className='chat-prev';
+      el.innerHTML='<div class="cp-av">'+c.av+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:var(--text)">'+c.name+'</div><div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">'+c.msg+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span style="font-size:10px;color:var(--muted)">'+c.time+'</span>'+(c.un?'<div class="undot"></div>':'')+'</div>';
+      cl.appendChild(el);
+    });
+    var bl=document.getElementById('act-bookings');if(!bl)return;bl.innerHTML='';
+    var bookings=[
+      {item:'Keke seat · Yaba run',time:'Today 2:14pm',status:'completed'},
+      {item:'Truck delivery · Apapa',time:'Yesterday',status:'completed'},
+      {item:'Car ride · VI',time:'Mon',status:'cancelled'},
+    ];
+    bookings.forEach(function(b){
+      var el=document.createElement('div');el.className='row';
+      el.innerHTML='<div><div class="row-l" style="color:var(--text)">'+b.item+'</div><div style="font-size:10px;color:var(--muted);margin-top:1px">'+b.time+'</div></div><span class="pill '+(b.status==='completed'?'pg':'pr')+'">'+b.status+'</span>';
+      bl.appendChild(el);
+    });
+  }
+};
+
+/* ═══════════════ PROFILE ═══════════════ */
+var PROF={
+  roles:{buyer:true,seller:true,driver:false},
+  setRole:function(role,el){
+    PROF.roles[role]=!PROF.roles[role];
+    var classes={buyer:{on:'b-on',off:''},seller:{on:'s-on',off:''},driver:{on:'s-on',off:''}};
+    var c=classes[role];
+    el.className='mopt'+(PROF.roles[role]?' '+(c.on):'');
+    var rdesc=document.getElementById('role-desc');
+    var active=Object.keys(PROF.roles).filter(function(k){return PROF.roles[k];});
+    var descs={buyer:'Discover & buy items nearby.',seller:'List goods and services on the radar.',driver:'Offer transport · your vehicle appears on nearby radars.'};
+    rdesc.textContent=active.length?active.map(function(k){return descs[k];}).join(' '):'Select at least one role.';
+    /* sync LENS Engine role with profile roles */
+    var hasSeller=PROF.roles.seller||PROF.roles.driver;
+    var hasBuyer=PROF.roles.buyer;
+    var newLensRole=hasSeller&&hasBuyer?'both':hasSeller?'providing':'seeking';
+    LENS.setRole(newLensRole);
+    /* update radar role pill to match */
+    PORT.applyVisibilityGuard();
+    renderAll(); /* re-render beacons for new role perspective */
+  },
+  addVehicle:function(){
+    var types=VTYPES.filter(function(v){return v.isTransport;}).map(function(v){return v.label;}).join(', ');
+    var name=prompt('Vehicle type ('+types+'):');
+    if(!name)return;
+    var vt=VTYPES.find(function(v){return name.toLowerCase().includes(v.id)||name.toLowerCase().includes(v.label.toLowerCase().split(' ')[0]);});
+    myVehicles.push({id:'mv'+Date.now(),icon:(vt&&vt.icon)||'🚗',label:name,vt:(vt&&vt.id)||'car',plate:'',totalSeats:vt?vt.defaultSeats:2,seats:vt?vt.defaultSeats:2,parked:false});
+    PROF.refresh();
+  },
+  refresh:function(){
+    var vl=document.getElementById('vehicle-list');if(vl){
+      vl.innerHTML='';
+      myVehicles.forEach(function(v){
+        var el=document.createElement('div');el.className='listitem';
+        el.innerHTML='<div class="liico">'+v.icon+'</div><div class="liinfo"><div class="liname">'+v.label+'</div><div class="lisub">'+(v.plate||'No plate set')+' · '+v.seats+'/'+v.totalSeats+' seats</div></div><button onclick="DRV.open(PROF.getVehicle(\''+v.id+'\'))" style="background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:3px 9px;font-size:11px;cursor:pointer;flex-shrink:0">Manage</button>';
+        vl.appendChild(el);
+      });
+    }
+    var pl=document.getElementById('p-listings');if(pl){
+      pl.innerHTML='';
+      var mine=portfolio.filter(function(p){return p.status==='offering';});
+      var vaultItems=portfolio.filter(function(p){return p.status==='vault';});
+      if(!mine.length&&!vaultItems.length){pl.innerHTML='<div style="font-size:12px;color:var(--muted);padding:4px 0">No listings yet. Add items in Portfolio.</div>';return;}
+      mine.forEach(function(item){
+        var vtt=vtype(item.vt||'fixed');
+        var el=document.createElement('div');el.className='listitem';
+        var st=item.parked?'<span class="pill pb">Parked</span>':vtt.isTransport&&item.totalSeats?'<span class="pill pg">'+item.seats+' seats</span>':'<span class="pill pg">Live</span>';
+        el.innerHTML='<div class="liico">'+item.icon+'</div><div class="liinfo"><div class="liname">'+item.label+'</div><div class="lisub">'+item.price+' · offering</div></div>'+st;
+        pl.appendChild(el);
+      });
+      vaultItems.forEach(function(item){
+        var el=document.createElement('div');el.className='listitem';
+        el.style.opacity='0.55';
+        el.innerHTML='<div class="liico">'+item.icon+'</div><div class="liinfo"><div class="liname">'+item.label+'</div><div class="lisub">'+item.price+' · vault</div></div><span class="pill" style="background:var(--surf2);color:var(--muted);border:1px solid var(--bdr)">Vault</span>';
+        el.onclick=(function(itm){return function(){PORT.cycleStatus(portfolio.indexOf(itm));};})(item);
+        pl.appendChild(el);
+      });
+    }
+    PROF.renderReviews();
+  },
+  getVehicle:function(id){return myVehicles.find(function(v){return v.id===id;})||myVehicles[0];},
+  renderReviews:function(){
+    var rr=document.getElementById('p-revs');if(!rr)return;
+    var reviews=[
+      {av:'BU',name:'Buyer',stars:4,comment:'Fast service, good value. Communication needs work.',time:'2 days ago'},
+      {av:'CK',name:'Customer',stars:5,comment:'All 5 stars! Responsive, reliable, great price and friendly. Highly recommend.',time:'1 week ago'},
+      {av:'OT',name:'User',stars:3,comment:'Good value but quality could improve.',time:'2 weeks ago'},
+    ];
+    rr.innerHTML='';
+    reviews.forEach(function(r){
+      var el=document.createElement('div');el.className='revitem';
+      var stars='';for(var i=0;i<5;i++)stars+='<span style="font-size:12px;color:'+(i<r.stars?'#f59e0b':'var(--bdr2)')+'">★</span>';
+      el.innerHTML='<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px"><div class="cp-av" style="width:26px;height:26px;font-size:10px">'+r.av+'</div><span style="font-size:12px;font-weight:500">'+r.name+'</span><div style="margin-left:auto">'+stars+'</div></div><div style="font-size:12px;color:var(--muted);line-height:1.4">'+r.comment+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">'+r.time+'</div>';
+      rr.appendChild(el);
+    });
+  }
+};
+
+/* ═══════════════ BEARING CONTROL ═══════════════ */
+function setBearing(deg){
+  deg=parseInt(deg,10);
+  userBearing=deg;
+  /* rotate compass needle */
+  var needle=document.getElementById('bearing-needle');
+  if(needle){
+    var rad=(deg-90)*(Math.PI/180);
+    var x2=22+17*Math.cos(rad);
+    var y2=22+17*Math.sin(rad);
+    needle.setAttribute('x2',x2.toFixed(1));
+    needle.setAttribute('y2',y2.toFixed(1));
+  }
+  var dv=document.getElementById('bearing-deg');
+  if(dv)dv.textContent=deg+'°';
+  /* re-render all nodes with updated corridor weights */
+  renderAll();
+}
+
+/* ═══════════════ SCAN ═══════════════ */
+function doScan(){
+  var r=document.getElementById('rings');if(!r)return;
+  var w=document.createElement('div');
+  var sid='sw'+Date.now();
+  var s=document.createElement('style');
+  s.textContent='@keyframes '+sid+'{0%{width:0;height:0;opacity:1}100%{width:500px;height:500px;opacity:0}}';
+  document.head.appendChild(s);
+  w.style.cssText='position:absolute;top:50%;left:50%;border-radius:50%;border:2px solid rgba(0,229,160,.5);transform:translate(-50%,-50%);pointer-events:none;animation:'+sid+' .9s ease-out forwards';
+  r.appendChild(w);
+  setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},1000);
+}
+
+/* ═══════════════ INIT ═══════════════ */
+window.addEventListener('resize',function(){drawBg();renderAll();});
+/* derive allItems from portfolio state before first render */
+allItems=portfolioToRadar();
+drawBg();buildRings();renderAll();
+PORT.render();ACT.render();PROF.refresh();
 GL.init();
-LENS.setRole('both');
+buildStars(itemStars);updateAutoComment(itemStars);
+LENS.updateHUD();
+LENS.setRole('both'); /* default: both buyer and seller active */
 
-// Simulate speed & movement (unchanged)
-setInterval(()=>{mobiles.forEach(moveItem);},120);
-setInterval(()=>{ /* elapsed timer */ },1000);
+/* simulate speed samples for demo */
+var demoSpeeds=[1.1,1.2,1.0,1.3,1.1];
+var demoIdx=0;
+setInterval(function(){
+  LENS.ingestSpeed(demoSpeeds[demoIdx%demoSpeeds.length]);
+  demoIdx++;
+},3000);
 
-// Default to Assets tab on load
-showTab('assets');
-switchAssetsTab(0);
+setInterval(function(){mobiles.forEach(moveItem);},120);
+setInterval(function(){elapsedSec++;var m=Math.floor(elapsedSec/60),s=elapsedSec%60;var el=document.getElementById('elapsed');if(el)el.textContent=m+':'+(s<10?'0':'')+s;},1000);
+setTimeout(function(){mobiles[0].dist=255;},2000);
 </script>
 </body>
 </html>
